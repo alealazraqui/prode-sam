@@ -76,7 +76,44 @@ Comprobar:
 | `password` | String | Texto plano (MVP interno)                  |
 | `score`    | Number | Puntaje; `0` al alta manual vía seed       |
 
-El alta de usuarios es manual (`scripts/seed-users/`, tarea posterior); no hay endpoint de registro en esta fase.
+El alta de usuarios es manual (`scripts/seed-users/`); no hay endpoint de registro en esta fase.
+
+## Seed de usuarios (manual)
+
+1. Copiar el ejemplo y completar usuarios reales (este archivo no se commitea):
+
+   ```bash
+   cp scripts/seed-users/users.example.json scripts/seed-users/users.json
+   ```
+
+2. Definir profile y tabla (nombre físico tras deploy, por defecto `Users`):
+
+   ```powershell
+   $env:AWS_PROFILE = "prode-dev"
+   $env:USERS_TABLE_NAME = "Users"
+   npm run seed:users
+   ```
+
+   Alternativa sin variable de entorno:
+
+   ```powershell
+   $env:AWS_PROFILE = "prode-dev"
+   npm run seed:users -- --table Users
+   ```
+
+   Otro archivo JSON:
+
+   ```bash
+   npm run seed:users -- --table Users --file ./scripts/seed-users/users.json
+   ```
+
+3. Verificar un usuario en DynamoDB:
+
+   ```powershell
+   aws dynamodb get-item --table-name Users --key '{"username":{"S":"alejandro.alazraqui"}}'
+   ```
+
+   Debe existir `username`, `alias`, `password` y `score` en `0`.
 
 ## Arquitectura
 

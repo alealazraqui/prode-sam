@@ -1,0 +1,103 @@
+---
+description: Lineamientos de logging para Lambdas de prode-sam. Trazabilidad de entradas, salidas y excepciones.
+alwaysApply: true
+---
+
+# Logging de Lambdas - prode-sam
+
+Objetivo: poder rastrear el comportamiento de cada Lambda en CloudWatch viendo parametros de entrada, salida y cualquier excepcion sin instrumentacion adicional.
+
+## Que loguear
+
+| Momento | Que | Nivel |
+|---|---|---|
+| Entrada al handler | Evento recibido (sanitizado) | `INFO` |
+| Salida del handler | Respuesta generada (status + body) | `INFO` |
+| Excepcion capturada | Mensaje, tipo de error y stack | `ERROR` |
+| Paso relevante con I/O externo | Input y output del paso (DynamoDB, llamadas externas) | `DEBUG` (opcional) |
+
+## Estructura del log
+
+Usar `console.log` / `console.error` con objetos JSON estructurados para que CloudWatch Logs Insights pueda filtrarlos:
+
+```typescript
+console.log(JSON.stringify({ level: 'INFO', message: 'Lambda invocada', data: { ... } }));
+console.error(JSON.stringify({ level: 'ERROR', message: 'Error inesperado', error: { ... } }));
+```
+
+## Patron de entrada y salida
+
+Loguear al inicio y al final del handler, antes de retornar:
+
+```typescript
+export const handler = async (event: APIGatewayProxyEventV2): Promise<APIGatewayProxyResultV2> => {
+  console.log(JSON.stringify({
+    level: 'INFO',
+    message: 'Lambda invocada',
+    data: { httpMethod: event.requestContext.http.method, path: event.rawPath, body: event.body },
+  }));
+
+  try {
+    const input = parseInput(event);
+    const result = await executeStep(input);
+    const response = buildResponse(result);
+
+    console.log(JSON.stringify({
+      level: 'INFO',
+      message: 'Lambda completada',
+      data: { statusCode: response.statusCode },
+    }));
+
+    return response;
+  } catch (error) {
+    return handleError(error);
+  }
+};
+```
+
+## Patron de excepciones
+
+Loguear en `handleError` antes de armar la respuesta HTTP. Incluir tipo, mensaje y stack:
+
+```typescript
+export function handleError(error: unknown): APIGatewayProxyResultV2 {
+  const isAppError = error instanceof AppError;
+
+  console.error(JSON.stringify({
+    level: 'ERROR',
+    message: 'Excepcion capturada',
+    error: {
+      type: isAppError ? error.constructor.name : 'UnknownError',
+      message: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined,
+    },
+  }));
+
+  if (isAppError) {
+    return createHttpResponse(error.statusCode, { error: error.message });
+  }
+  return createHttpResponse(500, { error: 'Internal server error' });
+}
+```
+
+## Datos sensibles
+
+No loguear: passwords, tokens JWT, secretos de entorno ni datos personales completos.
+En el log de entrada, omitir campos sensibles del body antes de loguear:
+
+```typescript
+const safeBody = { ...parsedBody, password: '[REDACTED]' };
+```
+
+## Pasos con I/O externo (opcional pero recomendado)
+
+Para operaciones DynamoDB o llamadas externas, loguear input y output del paso para facilitar debug:
+
+```typescript
+async function fetchUser(userId: string): Promise<User> {
+  console.log(JSON.stringify({ level: 'DEBUG', message: 'fetchUser - inicio', data: { userId } }));
+  const user = await getItem({ tableName: USERS_TABLE, key: { PK: userId } });
+  console.log(JSON.stringify({ level: 'DEBUG', message: 'fetchUser - resultado', data: { found: !!user } }));
+  return user;
+}
+```

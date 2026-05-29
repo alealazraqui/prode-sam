@@ -1,0 +1,85 @@
+---
+description: Lineamientos de programacion funcional para prode-sam. Estructura de carpetas, patron orquestador y orden top-down de funciones.
+alwaysApply: true
+---
+
+# Programacion Funcional - prode-sam
+
+## Patron Orquestador
+
+Cada Lambda tiene un unico punto de entrada: `handler.ts`. Este archivo actua como **orquestador**: recibe el evento, coordina los pasos del caso de uso en orden y devuelve la respuesta. No contiene logica de negocio directa; delega en funciones nombradas.
+
+```typescript
+// handler.ts — orquestador
+export const handler = async (event: APIGatewayProxyEventV2): Promise<APIGatewayProxyResultV2> => {
+  try {
+    const input = parseInput(event);
+    const result = await executeStep(input);
+    return buildResponse(result);
+  } catch (error) {
+    return handleError(error);
+  }
+};
+```
+
+Regla: si el handler necesita un comentario para entender que hace un bloque, ese bloque debe ser una funcion con nombre descriptivo.
+
+## Estructura de Carpetas
+
+Cada Lambda vive en su propia carpeta bajo `src/functions/<caso-de-uso>/`:
+
+```
+src/functions/<caso-de-uso>/
+  handler.ts       → orquestador: coordina pasos, sin logica de negocio directa
+  steps.ts         → funciones de pasos del caso de uso (o archivos separados si crece)
+  types.ts         → tipos e interfaces especificos de esta Lambda
+```
+
+Extraer a `src/shared/` solo lo verdaderamente transversal (http, errors, dynamo, auth, config).
+No poner logica de negocio del Prode en `shared/`.
+
+## Orden Top-Down
+
+Las funciones dentro de un archivo se ordenan siguiendo el **arbol de llamadas en profundidad**: primero la funcion de nivel superior, luego cada funcion que esta invoca en el orden en que aparece en su cuerpo, y a continuacion los hijos de cada hijo. El lector puede seguir el flujo de arriba hacia abajo sin saltar el archivo.
+
+Regla concreta: **una funcion aparece despues de la primera funcion que la llama, y antes de sus propios hijos.**
+
+```typescript
+// Arbol: main -> parseArgs, resolveTable, seedUsers -> loadUsers, toSeedItem, putUser
+
+// CORRECTO — depth-first, orden de llamada
+function main() { parseArgs(); resolveTable(); seedUsers(); }
+function parseArgs() { ... }          // 1er hijo de main
+function resolveTable() { ... }       // 2do hijo de main
+function seedUsers() { loadUsers(); toSeedItem(); putUser(); }  // 3er hijo de main
+function loadUsers() { ... }          // 1er hijo de seedUsers
+function toSeedItem() { ... }         // 2do hijo de seedUsers
+function putUser() { ... }            // 3er hijo de seedUsers
+
+// INCORRECTO — mezcla niveles sin respetar el arbol
+function putUser() { ... }
+function seedUsers() { ... }
+function parseArgs() { ... }
+function main() { ... }
+```
+
+## Capas de Abstraccion
+
+Definir funciones en tres capas dentro de cada Lambda:
+
+| Capa | Descripcion | Ejemplos |
+|---|---|---|
+| Orquestacion | Coordina el flujo completo | `handler`, `processRequest` |
+| Pasos del caso de uso | Un paso concreto del flujo | `validateInput`, `fetchUser`, `buildResponse` |
+| Utilidades internas | Transformaciones puntuales | `parseDate`, `formatAmount` |
+
+Cada funcion pertenece a una sola capa. Una funcion de paso no llama a otra de paso del mismo nivel si eso crea dependencias horizontales confusas; en ese caso, elevar a orquestacion.
+
+## Funciones
+
+- Nombres descriptivos, verbo + sustantivo: `parseInput`, `validateUser`, `buildSuccessResponse`.
+- Una responsabilidad por funcion. Si necesita un comentario para separar "partes", dividir en funciones.
+- Preferir funciones puras: mismo input -> mismo output, sin efectos secundarios. Aislar los efectos (I/O, DynamoDB, llamadas externas) en funciones especificas y nombradas.
+- Sin clases salvo jerarquia de errores (`AppError`). Funciones y tipos, no instancias.
+- Sin estado mutable innecesario. Preferir `const` y valores inmutables.
+- Parametros maximos recomendados: 3. Si se necesitan mas, agrupar en un objeto tipado.

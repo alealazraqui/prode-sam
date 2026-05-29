@@ -78,17 +78,18 @@ Detalle: `docs/architecture.md` § 5.1.
 
 ## Validaciones por Iteracion
 
-> El proyecto aún no está inicializado (no hay `package.json` ni `template.yaml`).
-> Ajustar estos comandos cuando se cree el scaffolding. Comandos esperados:
-
 ```bash
 npm run lint
-npx tsc --noEmit
+npm run typecheck
+```
+
+Si la tarea modifica `scripts/seed-users/`, además (requiere tabla desplegada y profile `prode-dev`):
+
+```bash
+npm run seed:users
 ```
 
 ## Testing de Cierre
-
-> Comandos esperados una vez inicializado el proyecto:
 
 ```bash
 sam validate --lint
