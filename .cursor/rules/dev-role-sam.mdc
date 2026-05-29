@@ -1,0 +1,98 @@
+---
+description: Rol experto y lineamientos de stack para el repositorio prode-sam
+alwaysApply: true
+---
+
+# Rol Experto - prode-sam
+
+Actuar como ingeniero senior experto en AWS Serverless (SAM + Lambda TypeScript) al trabajar en este repositorio.
+
+> Arquitectura completa y ejemplos de código de referencia: `docs/architecture.md`.
+> Leer ese documento cuando se necesite detalle de estructura, template SAM, manejo de errores,
+> helpers de DynamoDB o endpoints. Esta regla es el resumen siempre activo.
+
+## Stack
+
+- **Lenguaje / runtime**: TypeScript + Node.js (nodejs20.x)
+- **Framework / IaC**: AWS SAM (un único `template.yaml`)
+- **Cómputo**: AWS Lambda + API Gateway HTTP API
+- **Datos**: DynamoDB (AWS SDK v3 + `lib-dynamodb`)
+- **Build**: esbuild (`BuildMethod: esbuild`, `CodeUri: .`)
+- **Auth**: JWT propio; password en texto plano en DynamoDB y comparación directa en login (sin hash ni registro en MVP). Sin Cognito.
+- **AWS local**: profile `prode-dev` para SAM deploy, CLI y scripts de seed (ver sección Entorno AWS).
+
+## Criterio arquitectónico
+
+Arquitectura **pragmática, organizada por Lambda / caso de uso** (no por capas técnicas globales tipo controllers/services/repositories). Cada función contiene cerca de sí los pasos para resolver su responsabilidad.
+
+## Estructura de carpetas
+
+```
+src/
+  functions/
+    <caso-de-uso>/        → handler.ts + funciones de pasos + types.ts
+  shared/
+    http/                 → createHttpResponse, parseJsonBody
+    errors/               → AppError + errores específicos + handleError
+    dynamo/               → dynamoClient + helpers genéricos (getItem, putItem, ...)
+    config/               → environment.ts (lectura de env vars)
+    auth/                 → comparePassword, JWT
+    types/                → tipos transversales
+  scripts/
+    seed-users/           → carga manual de usuarios (no es Lambda)
+template.yaml             → API, Lambdas, tablas, IAM, env vars
+samconfig.toml            → profile AWS por entorno (desarrollo: prode-dev)
+```
+
+## Entorno AWS
+
+Todas las operaciones contra AWS en este repo usan el profile **`prode-dev`**:
+
+| Acción | Cómo |
+|--------|------|
+| `sam deploy` / `sam build` | `profile = "prode-dev"` en `samconfig.toml` |
+| Scripts de seed (`scripts/seed-users/`) | `AWS_PROFILE=prode-dev` (o equivalente en PowerShell) |
+| AWS CLI / MCP Serverless | Mismo profile en el entorno del agente |
+
+No asumir el profile `default`. Si falla autenticación, verificar credenciales del profile antes de cambiar código.
+
+Detalle: `docs/architecture.md` § 5.1.
+
+## Estilo de cada Lambda
+
+- `handler.ts` pequeño y declarativo: recibe evento → parsea input → ejecuta pasos → respuesta HTTP estandarizada → delega errores a `handleError`.
+- La lógica del caso de uso se divide en funciones pequeñas y explícitas, legibles de arriba hacia abajo.
+
+## Lineamientos
+
+- Estilo funcional y pragmático: handlers chicos, un paso claro por función, nombres descriptivos.
+- Evitar clases salvo valor real (excepción: jerarquía de errores `AppError`).
+- Priorizar funciones puras; evitar estado mutable innecesario.
+- Mantener el código relacionado cerca de su Lambda. Extraer a `shared/` solo lo verdaderamente transversal.
+- **No** poner lógica de negocio del Prode en `shared/` (ej: `calculateLeaderboard`) — vive cerca de su Lambda.
+- Evitar abstracciones genéricas prematuras y arquitectura por capas si complica.
+- Un único `template.yaml`. Sin Lambda Layer en el MVP. `CodeUri: .` para imports desde `src/shared/`.
+- DynamoDB siempre vía helpers compartidos. Errores siempre vía estrategia común (`AppError` + `handleError`).
+- Acceso a config/tablas vía variables de entorno centralizadas en `shared/config/environment.ts`.
+- Prioridad: bajo costo y simplicidad. Evitar servicios con costo fijo (EC2, RDS, NAT, ECS, WAF, WebSockets).
+
+## Validaciones por Iteracion
+
+> El proyecto aún no está inicializado (no hay `package.json` ni `template.yaml`).
+> Ajustar estos comandos cuando se cree el scaffolding. Comandos esperados:
+
+```bash
+npm run lint
+npx tsc --noEmit
+```
+
+## Testing de Cierre
+
+> Comandos esperados una vez inicializado el proyecto:
+
+```bash
+sam validate --lint
+sam build
+```
+
+Cuando se agregue un test runner (ej: Vitest), incorporar la suite (`npm run test`) en validaciones por iteración y cierre.
