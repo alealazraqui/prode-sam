@@ -1,17 +1,17 @@
 {
-	"folders": [
-		{
-			"path": "."
-		},
-		{
-			"path": "../.cursor"
-		},
-		{
-			"path": "../Prode-FE-"
-		},
-		{
-			"path": "../prompts-prode"
-		}
-	],
-	"settings": {}
+  "folders": [
+    {
+      "name": ".cursor",
+      "path": "../.cursor",
+    },
+    {
+      "name": "prode-sam",
+      "path": ".",
+    },
+    {
+      "name": "Prode-FE-",
+      "path": "../Prode-FE-",
+    },
+  ],
+  "settings": {},
 }
