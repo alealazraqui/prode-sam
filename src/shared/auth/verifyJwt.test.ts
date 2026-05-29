@@ -11,10 +11,10 @@ describe('verifyJwt', () => {
   it('returns payload for a valid token', async () => {
     await withTestEnv(TEST_ENV, async () => {
       vi.resetModules();
-      const { createJwt } = await import('./createJwt');
       const { verifyJwt } = await import('./verifyJwt');
-
-      const token = createJwt({ username: 'alejandro', alias: 'Ale' });
+      const token = jwt.sign({ username: 'alejandro', alias: 'Ale' }, TEST_ENV.JWT_SECRET, {
+        expiresIn: '180d',
+      });
 
       expect(verifyJwt(token)).toEqual({ username: 'alejandro', alias: 'Ale' });
     });
@@ -23,10 +23,8 @@ describe('verifyJwt', () => {
   it('returns payload with username only when alias is absent', async () => {
     await withTestEnv(TEST_ENV, async () => {
       vi.resetModules();
-      const { createJwt } = await import('./createJwt');
       const { verifyJwt } = await import('./verifyJwt');
-
-      const token = createJwt({ username: 'alejandro' });
+      const token = jwt.sign({ username: 'alejandro' }, TEST_ENV.JWT_SECRET, { expiresIn: '180d' });
 
       expect(verifyJwt(token)).toEqual({ username: 'alejandro' });
     });

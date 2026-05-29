@@ -2,7 +2,7 @@ import jwt from 'jsonwebtoken';
 import { UnauthorizedError } from '../errors/UnauthorizedError';
 import { environment } from '../config/environment';
 import { asOptionalString, isNonEmptyString } from '../validation/typeValidation';
-import type { JwtPayload } from './createJwt';
+import type { JwtPayload } from './jwtPayload';
 
 export function verifyJwt(token: string): JwtPayload {
   try {

@@ -8,7 +8,10 @@
     "typecheck": "tsc --noEmit",
     "seed:users": "tsx scripts/seed-users/seed-users.ts",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "format": "prettier --write \"src/**/*.ts\" \"scripts/**/*.ts\"",
+    "format:check": "prettier --check \"src/**/*.ts\" \"scripts/**/*.ts\"",
+    "debug:invoke": "tsx scripts/debug-invoke.ts"
   },
   "dependencies": {
     "@aws-sdk/client-dynamodb": "^3.812.0",
@@ -21,6 +24,7 @@
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^22.15.21",
     "eslint": "^9.28.0",
+    "prettier": "^3.8.3",
     "tsx": "^4.19.4",
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.33.1",

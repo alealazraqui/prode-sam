@@ -1,0 +1,104 @@
+---
+description: Convencion de invocaciones manuales y configuracion de debug para Lambdas de prode-sam. Aplicar al crear una Lambda nueva o al agregar una invocacion a una Lambda existente.
+alwaysApply: false
+---
+
+# Invocaciones manuales y debug de Lambdas
+
+## Cuando aplicar esta regla
+
+- Al crear una Lambda nueva (`src/functions/<caso>/handler.ts`).
+- Al agregar un caso de invocacion a una Lambda existente.
+- Al ejecutar o debuggear manualmente un handler.
+
+---
+
+## Al crear una Lambda nueva — checklist obligatorio
+
+Ademas de los archivos de implementacion, crear siempre:
+
+### 1. JSONs de invocacion
+
+Carpeta: `src/functions/<caso>/invocations/`
+
+Crear **solo los casos principales**: happy path y el fallo critico mas representativo (no replicar la suite de tests unitarios).
+
+Estructura del JSON: evento `APIGatewayProxyEventV2` (HTTP API v2). Usar como referencia los JSONs existentes en `src/functions/login/invocations/`.
+
+Reglas:
+- No incluir secrets reales; usar placeholders (`"dev-secret-local"`, valores del seed de ejemplo).
+- Nombrar descriptivamente: `<caso>-success.json`, `<caso>-<fallo>.json`.
+
+### 2. Entrada en `launch.json`
+
+Archivo: `PRODE_MUNDIAL/.vscode/launch.json` (fuente de verdad; tambien reflejarlo en `prode-sam/.vscode/launch.json`).
+
+Agregar **un bloque en `configurations`**:
+
+```json
+{
+  "type": "node",
+  "request": "launch",
+  "name": "prode-sam › <Label>",
+  "program": "${workspaceFolder:PRODE_MUNDIAL}/prode-sam/scripts/debug-invoke.ts",
+  "args": ["<caso>", "${input:<caso>_invocation}"],
+  "cwd": "${workspaceFolder:PRODE_MUNDIAL}/prode-sam",
+  "console": "integratedTerminal",
+  "runtimeArgs": ["-r", "tsx/cjs/register"],
+  "env": {
+    "JWT_SECRET": "dev-secret-local",
+    "USERS_TABLE_NAME": "Users",
+    "AWS_PROFILE": "prode-dev"
+  },
+  "skipFiles": ["<node_internals>/**"]
+}
+```
+
+Agregar **un bloque en `inputs`**:
+
+```json
+{
+  "id": "<caso>_invocation",
+  "type": "pickString",
+  "description": "<Label>: invocacion a ejecutar",
+  "options": [
+    { "label": "<descripcion>", "value": "<nombre-json-sin-extension>" }
+  ],
+  "default": "<nombre-json-happy-path>"
+}
+```
+
+Un bloque `configuration` + un bloque `input` por Lambda. El `launch.json` crece O(lambdas), no O(invocaciones).
+
+---
+
+## Ejecutar una invocacion manualmente (sam local invoke)
+
+Requiere Docker en ejecucion y stack desplegado.
+
+```powershell
+$env:AWS_PROFILE = "prode-dev"
+sam build
+sam local invoke <FunctionLogicalName> `
+  -e src/functions/<caso>/invocations/<invocacion>.json `
+  --parameter-overrides JwtSecret=dev-secret-local
+```
+
+El nombre logico de la funcion esta en `template.yaml` (ej. `login` → `LoginFunction`).
+
+Imprimir la salida completa e interpretar: statusCode, body parseado, si coincide con el resultado esperado.
+
+## Debuggear con breakpoints (VS Code)
+
+Run and Debug → elegir `prode-sam › <Label>` → seleccionar invocacion en el dropdown → F5.
+
+Ejecuta el handler en Node directo (sin Docker) usando `scripts/debug-invoke.ts`. Los breakpoints en TypeScript funcionan de forma nativa.
+
+---
+
+## Que no hacer
+
+- No crear un JSON de invocacion por cada caso de test unitario.
+- No editar `launch.json` para pasar secrets reales.
+- No usar `sam local start-api` salvo que se pida probar via HTTP.
+- No modificar codigo salvo que el usuario lo pida explicitamente.

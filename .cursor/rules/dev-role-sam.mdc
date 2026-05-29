@@ -18,7 +18,7 @@ Actuar como ingeniero senior experto en AWS Serverless (SAM + Lambda TypeScript)
 - **Cómputo**: AWS Lambda + API Gateway HTTP API
 - **Datos**: DynamoDB (AWS SDK v3 + `lib-dynamodb`)
 - **Build**: esbuild (`BuildMethod: esbuild`, `CodeUri: .`)
-- **Auth**: JWT propio; password en texto plano en DynamoDB y comparación directa en login (sin hash ni registro en MVP). Sin Cognito.
+- **Auth**: JWT propio; password en texto plano en DynamoDB y comparación directa en login (sin hash ni registro en MVP). Sin Cognito. Emisión del token (`createJwt`) vive en la Lambda login; verificación (`verifyJwt`) en `shared/auth` para el authorizer y futuras Lambdas protegidas.
 - **AWS local**: profile `prode-dev` para SAM deploy, CLI y scripts de seed (ver sección Entorno AWS).
 
 ## Criterio arquitectónico
@@ -37,7 +37,7 @@ src/
     dynamo/               → dynamoClient + helpers genéricos (getItem, putItem, ...)
     config/               → environment.ts (lectura de env vars)
     validation/           → typeValidation (guards reutilizables para unknown → tipos)
-    auth/                 → createJwt, verifyJwt
+    auth/                 → verifyJwt, jwtPayload (tipo compartido del token)
     test/                 → helpers reutilizables para tests (mockApiGatewayEvent, withTestEnv, ...)
     types/                → tipos transversales
   scripts/
@@ -78,9 +78,27 @@ Detalle: `docs/architecture.md` § 5.1.
 - Acceso a config/tablas vía variables de entorno centralizadas en `shared/config/environment.ts`.
 - Prioridad: bajo costo y simplicidad. Evitar servicios con costo fijo (EC2, RDS, NAT, ECS, WAF, WebSockets).
 
+## Auth en API Gateway (HTTP API)
+
+Los tokens HS256 con `JWT_SECRET` **no** son compatibles con el JWT authorizer nativo de HTTP API (solo RSA/JWKS). Usar **Lambda authorizer** que delegue en `shared/auth/verifyJwt`.
+
+| Tipo de ruta | Configuración SAM |
+|--------------|-------------------|
+| Pública (ej. `POST /auth/login`) | `Auth: Authorizer: NONE` en el evento HttpApi |
+| Protegida | `DefaultAuthorizer` en `AWS::Serverless::HttpApi` apuntando a `JwtAuthorizerFunction` |
+
+Parámetros clave del authorizer en `template.yaml`:
+
+- `AuthorizerPayloadFormatVersion: '2.0'`
+- `EnableSimpleResponses: true` → respuesta `{ isAuthorized: true/false }`
+- `Identity.Headers: [Authorization]` → Bearer token
+
+La Lambda authorizer vive en `src/functions/jwt-authorizer/`; rutas futuras heredan el authorizer por defecto salvo exclusión explícita.
+
 ## Validaciones por Iteracion
 
 ```bash
+npm run format
 npm run lint
 npm run typecheck
 npm run test

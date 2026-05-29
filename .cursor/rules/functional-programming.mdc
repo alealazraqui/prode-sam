@@ -31,11 +31,19 @@ Cada Lambda vive en su propia carpeta bajo `src/functions/<caso-de-uso>/`:
 ```
 src/functions/<caso-de-uso>/
   handler.ts       → orquestador: coordina pasos, sin logica de negocio directa
-  steps.ts         → funciones de pasos del caso de uso (o archivos separados si crece)
   types.ts         → tipos e interfaces especificos de esta Lambda
+  *.ts             → funciones de pasos u utilidades (ver criterio abajo)
 ```
 
-Extraer a `src/shared/` solo lo verdaderamente transversal (http, errors, dynamo, auth, config).
+### Organizacion de archivos dentro de una Lambda
+
+No imponer un archivo fijo por Lambda. Partir en archivos separados **solo cuando valga la pena encapsular** (responsabilidad clara, reutilizacion dentro del mismo caso de uso, o archivo que crece demasiado).
+
+- Funciones **muy internas** a un paso (helpers de una sola funcion, transformaciones puntuales): mantenerlas en el **mismo archivo** que quien las invoca, respetando orden top-down.
+- Pasos del flujo con responsabilidad propia y legible por separado (ej. validacion, autenticacion, respuesta): pueden ir en archivos distintos si mejora la lectura.
+- El criterio es pragmatico: menos archivos mientras el flujo se entienda; mas archivos cuando el encapsulado aporta claridad.
+
+Extraer a `src/shared/` solo lo verdaderamente transversal (http, errors, dynamo, auth de verificacion, config).
 No poner logica de negocio del Prode en `shared/`.
 
 ## Orden Top-Down

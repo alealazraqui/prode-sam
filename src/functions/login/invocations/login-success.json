@@ -1,0 +1,29 @@
+{
+  "version": "2.0",
+  "routeKey": "POST /auth/login",
+  "rawPath": "/auth/login",
+  "rawQueryString": "",
+  "headers": {
+    "content-type": "application/json"
+  },
+  "requestContext": {
+    "accountId": "123456789012",
+    "apiId": "local",
+    "domainName": "localhost",
+    "domainPrefix": "localhost",
+    "http": {
+      "method": "POST",
+      "path": "/auth/login",
+      "protocol": "HTTP/1.1",
+      "sourceIp": "127.0.0.1",
+      "userAgent": "manual-invoke"
+    },
+    "requestId": "local-login-success",
+    "routeKey": "POST /auth/login",
+    "stage": "$default",
+    "time": "01/Jan/2024:00:00:00 +0000",
+    "timeEpoch": 1704067200000
+  },
+  "body": "{\"username\":\"alejandro.alazraqui\",\"password\":\"alejandro.lort\"}",
+  "isBase64Encoded": false
+}

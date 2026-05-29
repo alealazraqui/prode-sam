@@ -1,0 +1,79 @@
+---
+description: Estrategia de testing minimalista para prode-sam. Tests solo donde el valor supera el costo; sin objetivo de cobertura absoluta.
+alwaysApply: false
+---
+
+# Testing Strategy - prode-sam
+
+Objetivo: testear solo lo que puede romper silenciosamente y tiene lógica no trivial.
+No buscar cobertura absoluta. La ausencia de un test es aceptable si el código es trivial.
+
+## Stack
+
+- **Test runner**: Vitest (`vitest.config.ts`, alias `@/` → `src/`)
+- **Entorno**: `node` (sin DOM)
+- **Helpers compartidos**: `src/shared/test/` → `withTestEnv`, `mockApiGatewayEvent`, `parseHttpResponseBody`
+
+## Qué testear (alto valor / bajo costo)
+
+| Capa | Qué testear | Técnica |
+|------|-------------|---------|
+| Pasos de Lambda | Validación de input, transformaciones, reglas de negocio puras | Unitario Vitest, funciones exportadas |
+| Orquestador (`handler.ts`) | Status code y body HTTP ante entradas representativas | `mockApiGatewayEvent` + mocks de I/O |
+| `shared/` transversal | Helpers con lógica propia (`verifyJwt`, `parseJsonBody`, `handleError`, guards) | Unitario Vitest; `withTestEnv` para env vars |
+| Lambda authorizer | Allow/Deny según header `Authorization` y validez del token | Mock de `verifyJwt` + evento authorizer mínimo |
+
+## Qué NO testear
+
+- `template.yaml` e infra SAM (validar con `sam validate --lint` + `sam build`)
+- Handlers que solo delegan sin lógica propia (si el paso ya está cubierto)
+- Wrappers finos sobre AWS SDK sin reglas adicionales
+- Código trivial pass-through (getters, re-exports)
+- Scripts de seed salvo lógica de transformación no trivial
+
+## Reglas
+
+- Sin target de cobertura numérica.
+- Tests colocados junto al módulo: `loginValidation.test.ts` al lado de `loginValidation.ts`.
+- Un test debe fallar cuando **cambia el comportamiento**, no cuando cambia el internals.
+- Diseñar tests como caja negra: el esperado sale de CA/contratos, no de mirar la implementación.
+- Preferir mocks solo en fronteras de I/O (`getItem`, `verifyJwt`, env vars). No mockear la unidad bajo test.
+- Efectos externos (DynamoDB real, API desplegada): smoke manual post-build, no en la suite unitaria.
+
+## Invocaciones manuales y debug
+
+Al crear una Lambda nueva, seguir la regla `lambda-invocations.mdc`: crear JSONs en `invocations/` (solo happy path + fallo critico) y agregar la entrada correspondiente en `.vscode/launch.json`.
+
+## Patrones por tipo de Lambda
+
+### HTTP handler
+
+```typescript
+// Entrada → handler → assert statusCode + body parseado
+const event = mockApiGatewayEvent({ body: JSON.stringify({ ... }) });
+const response = (await handler(event)) as APIGatewayProxyStructuredResultV2;
+expect(response.statusCode).toBe(200);
+```
+
+### Pasos con env vars o módulos con side effects al importar
+
+```typescript
+await withTestEnv({ JWT_SECRET: '...', USERS_TABLE_NAME: 'Users' }, async () => {
+  vi.resetModules();
+  const { myFn } = await import('./myModule');
+  // ...
+});
+```
+
+### Authorizer
+
+- Mock de `verifyJwt` para aislar extracción del Bearer token.
+- Evento mínimo tipado como `APIGatewayRequestAuthorizerEventV2` (incluir `cookies: []`).
+
+## Archivos de test esperados
+
+| Ubicación | Cuándo crearlo |
+|-----------|---------------|
+| `src/functions/<caso>/handler.test.ts` | Lambda HTTP con flujo orquestado |
+| `src/functions/<caso>/*.test.ts` | Paso con lógica o reglas no triviales |
+| `src/shared/**/*.test.ts` | Helper compartido con lógica propia |
