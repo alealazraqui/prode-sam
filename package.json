@@ -6,19 +6,25 @@
   "scripts": {
     "lint": "eslint \"src/**/*.ts\" \"scripts/**/*.ts\"",
     "typecheck": "tsc --noEmit",
-    "seed:users": "tsx scripts/seed-users/seed-users.ts"
+    "seed:users": "tsx scripts/seed-users/seed-users.ts",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "@aws-sdk/client-dynamodb": "^3.812.0",
-    "@aws-sdk/lib-dynamodb": "^3.812.0"
+    "@aws-sdk/lib-dynamodb": "^3.812.0",
+    "jsonwebtoken": "^9.0.3"
   },
   "devDependencies": {
-    "tsx": "^4.19.4",
     "@eslint/js": "^9.28.0",
+    "@types/aws-lambda": "^8.10.161",
+    "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^22.15.21",
     "eslint": "^9.28.0",
+    "tsx": "^4.19.4",
     "typescript": "^5.8.3",
-    "typescript-eslint": "^8.33.1"
+    "typescript-eslint": "^8.33.1",
+    "vitest": "^4.1.7"
   },
   "engines": {
     "node": ">=20"

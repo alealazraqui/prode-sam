@@ -36,7 +36,9 @@ src/
     errors/               → AppError + errores específicos + handleError
     dynamo/               → dynamoClient + helpers genéricos (getItem, putItem, ...)
     config/               → environment.ts (lectura de env vars)
-    auth/                 → comparePassword, JWT
+    validation/           → typeValidation (guards reutilizables para unknown → tipos)
+    auth/                 → createJwt, verifyJwt
+    test/                 → helpers reutilizables para tests (mockApiGatewayEvent, withTestEnv, ...)
     types/                → tipos transversales
   scripts/
     seed-users/           → carga manual de usuarios (no es Lambda)
@@ -81,6 +83,7 @@ Detalle: `docs/architecture.md` § 5.1.
 ```bash
 npm run lint
 npm run typecheck
+npm run test
 ```
 
 Si la tarea modifica `scripts/seed-users/`, además (requiere tabla desplegada y profile `prode-dev`):
@@ -92,8 +95,7 @@ npm run seed:users
 ## Testing de Cierre
 
 ```bash
+npm run test
 sam validate --lint
 sam build
 ```
-
-Cuando se agregue un test runner (ej: Vitest), incorporar la suite (`npm run test`) en validaciones por iteración y cierre.
