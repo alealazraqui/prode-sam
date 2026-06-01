@@ -102,6 +102,30 @@ Resources:
         Target: es2020
         Sourcemap: true
 
+  GetCurrentUserFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: .
+      Handler: src/functions/get-current-user/handler.handler
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref UsersTable
+      Events:
+        GetCurrentUserApi:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref ProdeHttpApi
+            Path: /users/me
+            Method: GET
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        EntryPoints:
+          - src/functions/get-current-user/handler.ts
+        Minify: true
+        Target: es2020
+        Sourcemap: true
+
 Outputs:
   UsersTableName:
     Description: DynamoDB Users table name (for seed scripts and Lambdas)

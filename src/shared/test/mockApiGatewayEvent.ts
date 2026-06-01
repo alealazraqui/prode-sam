@@ -5,6 +5,7 @@ type MockApiGatewayEventInput = {
   headers?: Record<string, string>;
   method?: string;
   path?: string;
+  authorizerContext?: Record<string, string>;
 };
 
 export function mockApiGatewayEvent(input: MockApiGatewayEventInput = {}): APIGatewayProxyEventV2 {
@@ -34,6 +35,13 @@ export function mockApiGatewayEvent(input: MockApiGatewayEventInput = {}): APIGa
       stage: '$default',
       time: '01/Jan/2024:00:00:00 +0000',
       timeEpoch: 1_704_067_200_000,
+      ...(input.authorizerContext
+        ? {
+            authorizer: {
+              lambda: input.authorizerContext,
+            },
+          }
+        : {}),
     },
     body: input.body ?? undefined,
     isBase64Encoded: false,

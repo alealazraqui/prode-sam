@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import { BadRequestError } from './BadRequestError';
+import { NotFoundError } from './NotFoundError';
 import { UnauthorizedError } from './UnauthorizedError';
 import { handleError } from './handleError';
 import { parseHttpResponseBody } from '@/shared/test/parseHttpResponseBody';
@@ -12,6 +13,16 @@ describe('handleError', () => {
     expect(parseHttpResponseBody(response.body)).toEqual({
       code: 'BAD_REQUEST',
       message: 'Invalid input',
+    });
+  });
+
+  it('maps NotFoundError to 404', () => {
+    const response = handleError(new NotFoundError('Usuario no encontrado.'));
+
+    expect(response.statusCode).toBe(404);
+    expect(parseHttpResponseBody(response.body)).toEqual({
+      code: 'NOT_FOUND',
+      message: 'Usuario no encontrado.',
     });
   });
 

@@ -18,7 +18,7 @@ Actuar como ingeniero senior experto en AWS Serverless (SAM + Lambda TypeScript)
 - **Cómputo**: AWS Lambda + API Gateway HTTP API
 - **Datos**: DynamoDB (AWS SDK v3 + `lib-dynamodb`)
 - **Build**: esbuild (`BuildMethod: esbuild`, `CodeUri: .`)
-- **Auth**: JWT propio; password en texto plano en DynamoDB y comparación directa en login (sin hash ni registro en MVP). Sin Cognito. Emisión del token (`createJwt`) vive en la Lambda login; verificación (`verifyJwt`) en `shared/auth` para el authorizer y futuras Lambdas protegidas.
+- **Auth**: JWT propio; password en texto plano en DynamoDB y comparación directa en login (sin hash ni registro en MVP). Sin Cognito. Emisión del token (`createJwt`) vive en la Lambda login; en `shared/auth`: verificación (`verifyJwt`, authorizer) y extracción de `username` en handlers protegidos (`extractAuthenticatedUsername`).
 - **AWS local**: profile `prode-dev` para SAM deploy, CLI y scripts de seed (ver sección Entorno AWS).
 
 ## Criterio arquitectónico
@@ -94,6 +94,8 @@ Parámetros clave del authorizer en `template.yaml`:
 - `Identity.Headers: [Authorization]` → Bearer token
 
 La Lambda authorizer vive en `src/functions/jwt-authorizer/`; rutas futuras heredan el authorizer por defecto salvo exclusión explícita.
+
+Handlers protegidos: leer identidad desde `requestContext.authorizer.lambda` (no re-verificar JWT). Ver `http-api-authorizer-context.mdc`.
 
 ## Validaciones por Iteracion
 

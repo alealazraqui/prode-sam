@@ -1,0 +1,49 @@
+---
+description: Contexto del Lambda authorizer en rutas protegidas HTTP API v2. Aplicar al implementar o testear Lambdas que requieren usuario autenticado.
+globs: src/functions/**/*
+alwaysApply: false
+---
+
+# Contexto del authorizer (HTTP API v2)
+
+Rutas protegidas por `JwtAuthorizer` en `template.yaml` **no deben re-verificar el JWT** en el handler. API Gateway ya validó el token; la identidad llega en el evento.
+
+## De dónde sale el username
+
+`jwt-authorizer` devuelve `context` con `username` (y opcionalmente `alias`). API Gateway lo expone así:
+
+```txt
+event.requestContext.authorizer.lambda.username
+event.requestContext.authorizer.lambda.alias   // opcional
+```
+
+Referencia de implementación: `src/functions/jwt-authorizer/handler.ts`, `src/shared/auth/extractAuthenticatedUsername.ts`.
+
+## Handler protegido
+
+- Extraer identidad con `extractAuthenticatedUsername` desde `@/shared/auth/extractAuthenticatedUsername` (no duplicar por Lambda).
+- Si falta `username` válido → `UnauthorizedError` (401). Caso típico: invoke local sin contexto simulado.
+- **No** llamar `verifyJwt` en el handler salvo requisito explícito distinto al authorizer por defecto.
+- Token inválido o ausente → **401 en API Gateway** (authorizer); no duplicar esos tests en cada handler.
+
+## TypeScript
+
+`APIGatewayEventRequestContextV2` no incluye `authorizer`. El cast vive en `shared/auth/extractAuthenticatedUsername.ts`; los handlers no reimplementan la extracción.
+
+## Tests unitarios
+
+Usar `mockApiGatewayEvent` con `authorizerContext`:
+
+```typescript
+mockApiGatewayEvent({
+  method: 'GET',
+  path: '/users/me',
+  authorizerContext: { username: 'alejandro', alias: 'Ale' },
+});
+```
+
+Equivale a `requestContext.authorizer.lambda` en producción.
+
+## Invocaciones manuales
+
+JSON en `src/functions/<caso>/invocations/`: incluir bloque `requestContext.authorizer.lambda` (ver `get-current-user/invocations/get-current-user-success.json`). El header `Authorization` en local no reemplaza ese contexto al debuggear con `debug-invoke.ts`.
