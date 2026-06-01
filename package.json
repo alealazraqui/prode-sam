@@ -11,7 +11,9 @@
     "test:watch": "vitest",
     "format": "prettier --write \"src/**/*.ts\" \"scripts/**/*.ts\"",
     "format:check": "prettier --check \"src/**/*.ts\" \"scripts/**/*.ts\"",
-    "debug:invoke": "tsx scripts/debug-invoke.ts"
+    "debug:invoke": "tsx scripts/debug-invoke.ts",
+    "local:api": "tsx scripts/sam-local-api.ts",
+    "local:api:no-debug": "tsx scripts/sam-local-api.ts --no-debug"
   },
   "dependencies": {
     "@aws-sdk/client-dynamodb": "^3.812.0",

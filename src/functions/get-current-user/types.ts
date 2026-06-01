@@ -1,6 +1,5 @@
 export type CurrentUserResponse = {
-  id: string;
-  name: string;
+  username: string;
   alias: string;
   score: number;
 };

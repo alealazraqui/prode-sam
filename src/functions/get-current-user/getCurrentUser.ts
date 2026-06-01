@@ -18,8 +18,7 @@ export async function getCurrentUser(username: string): Promise<CurrentUserRespo
 
 export function mapUserToCurrentUserResponse(user: UserItem): CurrentUserResponse {
   return {
-    id: user.username,
-    name: user.username,
+    username: user.username,
     alias: user.alias ?? user.username,
     score: user.score ?? 0,
   };

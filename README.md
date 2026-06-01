@@ -45,6 +45,31 @@ Build (sin Lambdas aún, valida empaquetado del stack):
 sam build
 ```
 
+## API local (sin deploy)
+
+Solo compila y levanta el API en tu máquina. **No ejecuta `sam deploy`.**
+
+1. `JWT_SECRET` en `prode-sam/.env.local` (ver `.env.example`).
+2. Run and Debug → **SAM local start-api** (o **prode-sam › SAM local start-api**).
+3. En la terminal vas a ver explícitamente:
+   - `sam build`
+   - `sam local start-api ... -d 9229` (puerto de debug)
+4. FE: `Prode-FE-/.env.local` → `VITE_API_BASE_URL=http://127.0.0.1:3000` y reiniciar Vite.
+
+Breakpoints en código Lambda (opcional): con el API ya corriendo, segundo launch → **Attach: SAM local Lambdas (9229)**.
+
+Alternativa más rápida (sin `-d 9229`): **SAM local start-api (sin puerto debug)**.
+
+Equivalente por terminal:
+
+```bash
+npm run local:api
+```
+
+---
+
+## Deploy a AWS (solo cuando quieras publicar)
+
 Deploy a AWS:
 
 ```bash

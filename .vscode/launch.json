@@ -1,0 +1,102 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "SAM local start-api",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["tsx", "scripts/sam-local-api.ts"],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "env": {
+        "AWS_PROFILE": "prode-dev"
+      },
+      "skipFiles": ["<node_internals>/**"]
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "SAM local start-api (sin puerto debug)",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["tsx", "scripts/sam-local-api.ts", "--no-debug"],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "env": {
+        "AWS_PROFILE": "prode-dev"
+      },
+      "skipFiles": ["<node_internals>/**"]
+    },
+    {
+      "type": "node",
+      "request": "attach",
+      "name": "Attach: SAM local Lambdas (9229)",
+      "port": 9229,
+      "restart": true,
+      "cwd": "${workspaceFolder}",
+      "localRoot": "${workspaceFolder}",
+      "remoteRoot": "/var/task",
+      "resolveSourceMapLocations": [
+        "${workspaceFolder}/**",
+        "!**/node_modules/**"
+      ],
+      "outFiles": ["${workspaceFolder}/.aws-sam/build/**/*.js"],
+      "sourceMaps": true,
+      "skipFiles": ["<node_internals>/**"]
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Login",
+      "program": "${workspaceFolder}/scripts/debug-invoke.ts",
+      "args": ["login", "${input:login_invocation}"],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "runtimeArgs": ["-r", "tsx/cjs/register"],
+      "envFile": "${workspaceFolder}/.env.local",
+      "env": {
+        "USERS_TABLE_NAME": "Users",
+        "AWS_PROFILE": "prode-dev"
+      },
+      "skipFiles": ["<node_internals>/**"]
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Get current user",
+      "program": "${workspaceFolder}/scripts/debug-invoke.ts",
+      "args": ["get-current-user", "${input:get_current_user_invocation}"],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "runtimeArgs": ["-r", "tsx/cjs/register"],
+      "envFile": "${workspaceFolder}/.env.local",
+      "env": {
+        "USERS_TABLE_NAME": "Users",
+        "AWS_PROFILE": "prode-dev"
+      },
+      "skipFiles": ["<node_internals>/**"]
+    }
+  ],
+  "inputs": [
+    {
+      "id": "login_invocation",
+      "type": "pickString",
+      "description": "Login: invocacion a ejecutar",
+      "options": [
+        { "label": "Credenciales validas", "value": "login-success" },
+        { "label": "Contrasena incorrecta", "value": "login-wrong-password" }
+      ],
+      "default": "login-success"
+    },
+    {
+      "id": "get_current_user_invocation",
+      "type": "pickString",
+      "description": "Get current user: invocacion a ejecutar",
+      "options": [
+        { "label": "Usuario existente", "value": "get-current-user-success" },
+        { "label": "Usuario inexistente en DB", "value": "get-current-user-not-found" }
+      ],
+      "default": "get-current-user-success"
+    }
+  ]
+}

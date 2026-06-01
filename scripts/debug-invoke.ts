@@ -2,7 +2,14 @@ import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 
-process.env.JWT_SECRET ??= 'dev-secret-local';
+import { loadEnvLocal } from './load-env-local';
+
+try {
+  loadEnvLocal();
+} catch {
+  // .env.local optional for debug-invoke when JWT_SECRET is set via launch.json envFile
+}
+
 process.env.USERS_TABLE_NAME ??= 'Users';
 
 async function main(): Promise<void> {

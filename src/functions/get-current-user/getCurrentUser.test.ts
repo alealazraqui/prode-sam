@@ -29,8 +29,7 @@ describe('getCurrentUser', () => {
       const result = await getCurrentUser('alejandro');
 
       expect(result).toEqual({
-        id: 'alejandro',
-        name: 'alejandro',
+        username: 'alejandro',
         alias: 'Ale',
         score: 42,
       });
@@ -73,7 +72,7 @@ describe('getCurrentUser', () => {
 });
 
 describe('mapUserToCurrentUserResponse', () => {
-  it('maps username to id and name and uses username as alias fallback', async () => {
+  it('maps username and uses username as alias fallback when alias is missing', async () => {
     const { mapUserToCurrentUserResponse } = await import('./getCurrentUser');
 
     expect(
@@ -82,8 +81,7 @@ describe('mapUserToCurrentUserResponse', () => {
         password: 'secret',
       }),
     ).toEqual({
-      id: 'demo',
-      name: 'demo',
+      username: 'demo',
       alias: 'demo',
       score: 0,
     });

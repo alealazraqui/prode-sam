@@ -39,8 +39,7 @@ describe('get-current-user handler', () => {
 
       expect(response.statusCode).toBe(200);
       expect(parseHttpResponseBody(response.body)).toEqual({
-        id: 'alejandro',
-        name: 'alejandro',
+        username: 'alejandro',
         alias: 'Ale',
         score: 42,
       });
