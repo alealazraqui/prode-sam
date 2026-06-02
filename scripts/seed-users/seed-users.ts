@@ -47,12 +47,15 @@ function resolveTableName(cliTable?: string): string {
 
 async function seedUsers(tableName: string, usersFile: string): Promise<void> {
   const users = loadUsers(usersFile);
+  const rankingPositions = assignUniqueRankingPositions(users.length);
   const client = DynamoDBDocumentClient.from(new DynamoDBClient({}));
 
-  for (const user of users) {
-    const item = toSeedItem(user);
+  for (let i = 0; i < users.length; i += 1) {
+    const item = toSeedItem(users[i], rankingPositions[i]);
     await putUser(client, tableName, item);
-    console.log(`Seeded user: ${item.username} (score=${item.score})`);
+    console.log(
+      `Seeded user: ${item.username} (score=${item.score}, rankingPosition=${item.rankingPosition})`,
+    );
   }
 
   console.log(`Done. ${users.length} user(s) written to table "${tableName}".`);
@@ -84,8 +87,21 @@ function loadUsers(filePath: string): SeedUserInput[] {
   });
 }
 
-function toSeedItem(user: SeedUserInput): SeedUserItem {
-  return { ...user, score: INITIAL_SCORE };
+function assignUniqueRankingPositions(userCount: number): number[] {
+  const positions = Array.from({ length: userCount }, (_, index) => index + 1);
+  shuffle(positions);
+  return positions;
+}
+
+function shuffle(values: number[]): void {
+  for (let i = values.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [values[i], values[j]] = [values[j], values[i]];
+  }
+}
+
+function toSeedItem(user: SeedUserInput, rankingPosition: number): SeedUserItem {
+  return { ...user, score: INITIAL_SCORE, rankingPosition };
 }
 
 async function putUser(

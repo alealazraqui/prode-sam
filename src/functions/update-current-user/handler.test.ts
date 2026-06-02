@@ -15,6 +15,7 @@ const mockUser: UserItem = {
   alias: 'Ale',
   password: '1234',
   score: 42,
+  rankingPosition: 7,
 };
 
 vi.mock('@/shared/dynamo/getItem', () => ({
@@ -49,6 +50,7 @@ describe('update-current-user handler', () => {
         username: 'alejandro',
         alias: 'Nuevo',
         score: 42,
+        rankingPosition: 7,
       });
     });
   });
@@ -76,6 +78,7 @@ describe('update-current-user handler', () => {
         username: 'alejandro',
         alias: 'Ale',
         score: 42,
+        rankingPosition: 7,
       });
       expect(putItem).toHaveBeenCalledWith('Users', expect.objectContaining({ password: 'nueva' }));
     });
@@ -104,6 +107,7 @@ describe('update-current-user handler', () => {
         username: 'alejandro',
         alias: 'Nuevo',
         score: 42,
+        rankingPosition: 7,
       });
     });
   });

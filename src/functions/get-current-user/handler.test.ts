@@ -15,6 +15,7 @@ const mockUser: UserItem = {
   alias: 'Ale',
   password: '1234',
   score: 42,
+  rankingPosition: 5,
 };
 
 vi.mock('@/shared/dynamo/getItem', () => ({
@@ -42,6 +43,7 @@ describe('get-current-user handler', () => {
         username: 'alejandro',
         alias: 'Ale',
         score: 42,
+        rankingPosition: 5,
       });
     });
   });

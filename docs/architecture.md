@@ -532,6 +532,7 @@ Leaderboard
 | `alias` | String | Nombre visible en la app. |
 | `password` | String | **Texto plano** (decisión explícita del proyecto: app interna entre amigos). |
 | `score` | Number | Puntaje acumulado; **siempre `0` en el alta manual** (script de seed). |
+| `rankingPosition` | Number | Posición en el ranking (1–11 en MVP); asignada aleatoriamente sin repetir en el seed. |
 
 Ejemplo de item:
 
@@ -540,11 +541,14 @@ Ejemplo de item:
   "username": "alejandro",
   "alias": "Ale",
   "password": "1234",
-  "score": 0
+  "score": 0,
+  "rankingPosition": 3
 }
 ```
 
 **Alta de usuarios:** solo manual (script en `scripts/seed-users/` o carga directa en consola). No hay endpoint ni Lambda de registro en el MVP.
+
+**Backfill MVP (`rankingPosition`):** usuarios existentes sin el campo deben actualizarse re-ejecutando el seed con profile `prode-dev` (sobrescribe items con posiciones nuevas aleatorias 1–11). Hasta entonces, `GET /users/me` devuelve `rankingPosition: 0` como default en el mapper.
 
 El ranking puede calcularse a demanda o recalcularse cuando un admin carga un resultado.
 

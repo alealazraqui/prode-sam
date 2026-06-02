@@ -100,8 +100,11 @@ Comprobar:
 | `alias`    | String | Nombre visible                             |
 | `password` | String | Texto plano (MVP interno)                  |
 | `score`    | Number | Puntaje; `0` al alta manual vía seed       |
+| `rankingPosition` | Number | Posición 1–11; shuffle único en seed |
 
 El alta de usuarios es manual (`scripts/seed-users/`); no hay endpoint de registro en esta fase.
+
+**Backfill `rankingPosition` (MVP):** re-ejecutar seed con `$env:AWS_PROFILE = "prode-dev"` para poblar el campo en usuarios existentes.
 
 ## Seed de usuarios (manual)
 

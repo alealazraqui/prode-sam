@@ -21,5 +21,6 @@ export function mapUserToCurrentUserResponse(user: UserItem): CurrentUserRespons
     username: user.username,
     alias: user.alias ?? user.username,
     score: user.score ?? 0,
+    rankingPosition: user.rankingPosition ?? 0,
   };
 }

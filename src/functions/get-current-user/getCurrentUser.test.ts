@@ -16,6 +16,7 @@ const mockUser: UserItem = {
   alias: 'Ale',
   password: '1234',
   score: 42,
+  rankingPosition: 3,
 };
 
 describe('getCurrentUser', () => {
@@ -32,6 +33,7 @@ describe('getCurrentUser', () => {
         username: 'alejandro',
         alias: 'Ale',
         score: 42,
+        rankingPosition: 3,
       });
       expect(result).not.toHaveProperty('password');
     });
@@ -51,6 +53,7 @@ describe('getCurrentUser', () => {
       const result = await getCurrentUser('alejandro');
 
       expect(result.score).toBe(0);
+      expect(result.rankingPosition).toBe(0);
     });
   });
 
@@ -84,6 +87,24 @@ describe('mapUserToCurrentUserResponse', () => {
       username: 'demo',
       alias: 'demo',
       score: 0,
+      rankingPosition: 0,
+    });
+  });
+
+  it('maps rankingPosition from user item', async () => {
+    const { mapUserToCurrentUserResponse } = await import('./getCurrentUser');
+
+    expect(
+      mapUserToCurrentUserResponse({
+        username: 'demo',
+        password: 'secret',
+        rankingPosition: 5,
+      }),
+    ).toEqual({
+      username: 'demo',
+      alias: 'demo',
+      score: 0,
+      rankingPosition: 5,
     });
   });
 });

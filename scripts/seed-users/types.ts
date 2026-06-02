@@ -6,4 +6,5 @@ export type SeedUserInput = {
 
 export type SeedUserItem = SeedUserInput & {
   score: number;
+  rankingPosition: number;
 };

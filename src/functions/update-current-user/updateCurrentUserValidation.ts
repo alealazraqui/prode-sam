@@ -4,9 +4,7 @@ import { parseJsonBody } from '@/shared/http/parseJsonBody';
 import { isString } from '@/shared/validation/typeValidation';
 import type { UpdateCurrentUserInput } from './types';
 
-export function parseUpdateCurrentUserInput(
-  event: APIGatewayProxyEventV2,
-): UpdateCurrentUserInput {
+export function parseUpdateCurrentUserInput(event: APIGatewayProxyEventV2): UpdateCurrentUserInput {
   const body = parseJsonBody<Record<string, unknown>>(event.body ?? null);
   const input: UpdateCurrentUserInput = {};
 

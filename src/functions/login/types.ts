@@ -12,4 +12,5 @@ export type UserItem = {
   alias?: string;
   password: string;
   score?: number;
+  rankingPosition?: number;
 };

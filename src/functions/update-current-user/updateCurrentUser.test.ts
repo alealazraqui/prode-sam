@@ -12,6 +12,7 @@ const mockUser: UserItem = {
   alias: 'Ale',
   password: '1234',
   score: 42,
+  rankingPosition: 7,
 };
 
 vi.mock('@/shared/dynamo/getItem', () => ({
@@ -23,7 +24,7 @@ vi.mock('@/shared/dynamo/putItem', () => ({
 }));
 
 describe('updateCurrentUser', () => {
-  it('updates only alias and preserves password and score', async () => {
+  it('updates only alias and preserves password, score and rankingPosition', async () => {
     await withTestEnv(TEST_ENV, async () => {
       vi.resetModules();
       const { getItem } = await import('@/shared/dynamo/getItem');
@@ -39,16 +40,18 @@ describe('updateCurrentUser', () => {
         alias: 'Nuevo',
         password: '1234',
         score: 42,
+        rankingPosition: 7,
       });
       expect(result).toEqual({
         username: 'alejandro',
         alias: 'Nuevo',
         score: 42,
+        rankingPosition: 7,
       });
     });
   });
 
-  it('updates only password and preserves alias and score', async () => {
+  it('updates only password and preserves alias, score and rankingPosition', async () => {
     await withTestEnv(TEST_ENV, async () => {
       vi.resetModules();
       const { getItem } = await import('@/shared/dynamo/getItem');
@@ -64,11 +67,13 @@ describe('updateCurrentUser', () => {
         alias: 'Ale',
         password: 'nueva',
         score: 42,
+        rankingPosition: 7,
       });
       expect(result).toEqual({
         username: 'alejandro',
         alias: 'Ale',
         score: 42,
+        rankingPosition: 7,
       });
     });
   });
@@ -92,11 +97,13 @@ describe('updateCurrentUser', () => {
         alias: 'Nuevo',
         password: 'nueva',
         score: 42,
+        rankingPosition: 7,
       });
       expect(result).toEqual({
         username: 'alejandro',
         alias: 'Nuevo',
         score: 42,
+        rankingPosition: 7,
       });
     });
   });
