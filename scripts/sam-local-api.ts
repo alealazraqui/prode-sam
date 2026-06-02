@@ -58,7 +58,9 @@ console.log(`> ${samCommand}`);
 console.log('');
 
 if (useDebugger) {
-  console.log(`Debugger en puerto ${DEBUG_PORT}. Para breakpoints: Run and Debug → "Attach: SAM local Lambdas (9229)"`);
+  console.log(
+    `Debugger en puerto ${DEBUG_PORT}. Para breakpoints: Run and Debug → "Attach: SAM local Lambdas (9229)"`,
+  );
   console.log('');
 }
 

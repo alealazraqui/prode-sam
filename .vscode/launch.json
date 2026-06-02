@@ -75,6 +75,22 @@
         "AWS_PROFILE": "prode-dev"
       },
       "skipFiles": ["<node_internals>/**"]
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Update current user",
+      "program": "${workspaceFolder}/scripts/debug-invoke.ts",
+      "args": ["update-current-user", "${input:update_current_user_invocation}"],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "runtimeArgs": ["-r", "tsx/cjs/register"],
+      "envFile": "${workspaceFolder}/.env.local",
+      "env": {
+        "USERS_TABLE_NAME": "Users",
+        "AWS_PROFILE": "prode-dev"
+      },
+      "skipFiles": ["<node_internals>/**"]
     }
   ],
   "inputs": [
@@ -97,6 +113,15 @@
         { "label": "Usuario inexistente en DB", "value": "get-current-user-not-found" }
       ],
       "default": "get-current-user-success"
+    },
+    {
+      "id": "update_current_user_invocation",
+      "type": "pickString",
+      "description": "Update current user: invocacion a ejecutar",
+      "options": [
+        { "label": "Actualizar alias", "value": "update-current-user-success" }
+      ],
+      "default": "update-current-user-success"
     }
   ]
 }

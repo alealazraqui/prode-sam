@@ -71,6 +71,31 @@ function parseArgs() { ... }
 function main() { ... }
 ```
 
+### Checklist al crear o editar archivos con varias funciones
+
+Antes de dar por terminado un archivo, verificar:
+
+1. **Depth-first:** funcion llamadora primero; luego cada funcion que invoca, en el orden en que aparecen en su cuerpo; despues los hijos de cada hijo.
+2. **Anti-patron:** no definir helpers o utilidades internas al inicio del archivo si solo las usa una funcion exportada mas abajo.
+3. **Modulos parse + validate** (u otros pasos encadenados desde el handler): `parseX` → helpers usados solo por `parseX` → `validateX` → helpers usados solo por `validateX`.
+
+```typescript
+// Arbol del handler: parseUpdateCurrentUserInput -> extractOptionalApplicableString; validateUpdateCurrentUserInput
+
+// CORRECTO
+export function parseUpdateCurrentUserInput(event) {
+  const alias = extractOptionalApplicableString(body.alias, 'alias');
+  // ...
+}
+function extractOptionalApplicableString(value, fieldName) { ... }
+export function validateUpdateCurrentUserInput(input) { ... }
+
+// INCORRECTO — helper antes del parse que lo usa
+function extractOptionalApplicableString(value, fieldName) { ... }
+export function parseUpdateCurrentUserInput(event) { ... }
+export function validateUpdateCurrentUserInput(input) { ... }
+```
+
 ## Capas de Abstraccion
 
 Definir funciones en tres capas dentro de cada Lambda:

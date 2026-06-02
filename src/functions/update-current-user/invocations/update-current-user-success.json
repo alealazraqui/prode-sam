@@ -1,0 +1,35 @@
+{
+  "version": "2.0",
+  "routeKey": "PATCH /users/me",
+  "rawPath": "/users/me",
+  "rawQueryString": "",
+  "headers": {
+    "authorization": "Bearer placeholder-token",
+    "content-type": "application/json"
+  },
+  "body": "{\"password\":\"N6gk8mkx8mp.\"}",
+  "requestContext": {
+    "accountId": "123456789012",
+    "apiId": "local",
+    "domainName": "localhost",
+    "domainPrefix": "localhost",
+    "http": {
+      "method": "PATCH",
+      "path": "/users/me",
+      "protocol": "HTTP/1.1",
+      "sourceIp": "127.0.0.1",
+      "userAgent": "manual-invoke"
+    },
+    "requestId": "local-update-current-user-success",
+    "routeKey": "PATCH /users/me",
+    "stage": "$default",
+    "time": "01/Jan/2024:00:00:00 +0000",
+    "timeEpoch": 1704067200000,
+    "authorizer": {
+      "lambda": {
+        "username": "alejandro.alazraqui"
+      }
+    }
+  },
+  "isBase64Encoded": false
+}

@@ -134,6 +134,32 @@ Resources:
         Target: es2020
         Sourcemap: true
 
+  UpdateCurrentUserFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: .
+      Handler: src/functions/update-current-user/handler.handler
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref UsersTable
+        - DynamoDBWritePolicy:
+            TableName: !Ref UsersTable
+      Events:
+        UpdateCurrentUserApi:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref ProdeHttpApi
+            Path: /users/me
+            Method: PATCH
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        EntryPoints:
+          - src/functions/update-current-user/handler.ts
+        Minify: true
+        Target: es2020
+        Sourcemap: true
+
 Outputs:
   UsersTableName:
     Description: DynamoDB Users table name (for seed scripts and Lambdas)
