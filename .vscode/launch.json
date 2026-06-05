@@ -107,6 +107,23 @@
         "AWS_PROFILE": "prode-dev"
       },
       "skipFiles": ["<node_internals>/**"]
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Get matches",
+      "program": "${workspaceFolder}/scripts/debug-invoke.ts",
+      "args": ["get-matches", "${input:get_matches_invocation}"],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "runtimeArgs": ["-r", "tsx/cjs/register"],
+      "envFile": "${workspaceFolder}/.env.local",
+      "env": {
+        "USERS_TABLE_NAME": "Users",
+        "MATCHES_TABLE_NAME": "Matches",
+        "AWS_PROFILE": "prode-dev"
+      },
+      "skipFiles": ["<node_internals>/**"]
     }
   ],
   "inputs": [
@@ -147,6 +164,15 @@
         { "label": "Listado de jugadores", "value": "get-users-success" }
       ],
       "default": "get-users-success"
+    },
+    {
+      "id": "get_matches_invocation",
+      "type": "pickString",
+      "description": "Get matches: invocacion a ejecutar",
+      "options": [
+        { "label": "Listado de partidos", "value": "get-matches-success" }
+      ],
+      "default": "get-matches-success"
     }
   ]
 }

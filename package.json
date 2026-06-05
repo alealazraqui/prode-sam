@@ -7,6 +7,7 @@
     "lint": "eslint \"src/**/*.ts\" \"scripts/**/*.ts\"",
     "typecheck": "tsc --noEmit",
     "seed:users": "tsx scripts/seed-users/seed-users.ts",
+    "seed:matches": "tsx scripts/seed-matches/seed-matches.ts",
     "test": "vitest run",
     "test:watch": "vitest",
     "format": "prettier --write \"src/**/*.ts\" \"scripts/**/*.ts\"",
