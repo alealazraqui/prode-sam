@@ -5,6 +5,7 @@ import { withTestEnv } from '@/shared/test/withTestEnv';
 const TEST_ENV = {
   JWT_SECRET: 'test-secret',
   USERS_TABLE_NAME: 'Users',
+  MATCHES_TABLE_NAME: 'Matches',
 };
 
 describe('createJwt', () => {

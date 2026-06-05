@@ -253,7 +253,12 @@ backend/
         verifyJwt.ts
 
       types/
+        userItem.ts
+        publicUserResponse.ts
         ApiGateway.ts
+
+      mappers/
+        mapUserItemToPublicResponse.ts
 ```
 
 ---
@@ -346,7 +351,38 @@ El código compartido vivirá en:
 src/shared/
 ```
 
-Puede contener:
+### 11.1 Criterio: qué centralizar y cuándo
+
+**Regla general:** si el **mismo** tipo, mapper o función/helper (pura o de infraestructura) lo necesitan **dos o más Lambdas** distintas bajo `src/functions/<caso>/`, debe vivir en `shared/` y **no** duplicarse ni colocarse en `types.ts` de una Lambda “dueña” (p. ej. `login/types.ts` con `UserItem` usado en todo el backend).
+
+| Situación | Ubicación |
+|-----------|-----------|
+| Usado por **una sola** Lambda | `functions/<caso>/` (pasos, `types.ts` del endpoint, validaciones locales) |
+| Usado por **≥ 2** Lambdas | `shared/` en la carpeta que corresponda (ver tabla abajo) |
+| Segunda Lambda necesita algo que hoy está en otra función | **Mover** a `shared/` y actualizar imports; no importar `functions/A` desde `functions/B` |
+
+**Qué va en cada carpeta de `shared/`:**
+
+| Contenido | Carpeta | Ejemplo |
+|-----------|---------|---------|
+| Shape de fila DynamoDB o DTO de API compartido | `shared/types/` | `UserItem`, `PublicUserResponse` |
+| Transformación pura reutilizada (sin I/O) | `shared/mappers/` | `mapUserItemToPublicResponse` |
+| Cliente y operaciones DynamoDB genéricas | `shared/dynamo/` | `getItem`, `scanTable` |
+| Respuestas HTTP, parseo de body | `shared/http/` | `createHttpResponse` |
+| Errores y `handleError` | `shared/errors/` | `NotFoundError` |
+| JWT, authorizer, contexto | `shared/auth/` | `verifyJwt`, `extractAuthenticatedUsername` |
+| Env vars | `shared/config/` | `environment.ts` |
+| Guards `unknown` → tipos | `shared/validation/` | `isNonEmptyString` |
+
+**Límites:**
+
+- `shared/` **no** importa desde `src/functions/`. Si un tipo compartido estaba en una Lambda, se mueve a `shared/types/`.
+- **No** es lógica de negocio específica de un solo flujo del Prode (cálculo de ranking, reglas de un endpoint, etc.) aunque sea “pura”: eso queda en la Lambda hasta que otra también lo necesite.
+- No crear carpetas genéricas vacías “por si acaso”; solo extraer cuando el umbral ≥2 Lambdas se cumple (o está por cumplirse en la misma tarea).
+
+**SAM / bundle:** los types no generan peso en runtime; esbuild incluye en cada Lambda solo lo que importa. Centralizar en `shared/` no requiere Lambda Layer.
+
+### 11.2 Contenido habitual de `shared/`
 
 - Helpers HTTP.
 - Manejo de errores.
@@ -354,7 +390,7 @@ Puede contener:
 - Helpers genéricos de DynamoDB.
 - Configuración.
 - Utilidades de auth.
-- Tipos transversales.
+- Tipos y mappers reutilizados (≥2 Lambdas).
 
 Ejemplos válidos:
 
@@ -362,18 +398,20 @@ Ejemplos válidos:
 shared/http/createHttpResponse.ts
 shared/errors/handleError.ts
 shared/dynamo/dynamoClient.ts
+shared/dynamo/scanTable.ts
 shared/config/environment.ts
+shared/types/userItem.ts
+shared/mappers/mapUserItemToPublicResponse.ts
 ```
 
-Ejemplos que inicialmente no deberían ir a `shared/`:
+Ejemplos que no deberían ir a `shared/` mientras solo una Lambda los use:
 
 ```txt
-calculateLeaderboard.ts
-validatePredictionRules.ts
-mapMatchResultToScore.ts
+functions/save-prediction/validatePredictionRules.ts
+functions/get-leaderboard/calculateLeaderboard.ts
 ```
 
-Esas funciones pertenecen al dominio del Prode y deberían vivir cerca de la Lambda que las usa, salvo que después se vuelvan claramente transversales.
+Si más adelante **otra** Lambda necesita la misma regla o mapper, recién ahí se evalúa moverlo a `shared/` (o se duplica brevemente solo si el contrato aún diverge).
 
 ---
 
@@ -895,8 +933,8 @@ También se recomienda:
 - Cada Lambda debe tener un `handler.ts` declarativo.
 - La lógica debe dividirse en pasos claros.
 - El código relacionado debe vivir cerca de la Lambda.
-- `shared/` debe contener solo utilidades realmente comunes.
-- No colocar lógica de negocio específica en `shared/` salvo reutilización clara.
+- `shared/` según § 11.1: tipos, mappers y helpers usados por ≥2 Lambdas; sin imports desde `functions/`.
+- No colocar lógica de negocio de un solo caso de uso en `shared/` hasta que otra Lambda la reutilice.
 - Evitar abstracciones genéricas prematuras.
 - Evitar arquitectura por capas si complica el desarrollo.
 - Mantener bajo costo y simplicidad como prioridad.

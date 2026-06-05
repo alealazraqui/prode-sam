@@ -91,6 +91,22 @@
         "AWS_PROFILE": "prode-dev"
       },
       "skipFiles": ["<node_internals>/**"]
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Get users",
+      "program": "${workspaceFolder}/scripts/debug-invoke.ts",
+      "args": ["get-users", "${input:get_users_invocation}"],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "runtimeArgs": ["-r", "tsx/cjs/register"],
+      "envFile": "${workspaceFolder}/.env.local",
+      "env": {
+        "USERS_TABLE_NAME": "Users",
+        "AWS_PROFILE": "prode-dev"
+      },
+      "skipFiles": ["<node_internals>/**"]
     }
   ],
   "inputs": [
@@ -122,6 +138,15 @@
         { "label": "Actualizar alias", "value": "update-current-user-success" }
       ],
       "default": "update-current-user-success"
+    },
+    {
+      "id": "get_users_invocation",
+      "type": "pickString",
+      "description": "Get users: invocacion a ejecutar",
+      "options": [
+        { "label": "Listado de jugadores", "value": "get-users-success" }
+      ],
+      "default": "get-users-success"
     }
   ]
 }

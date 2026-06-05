@@ -1,10 +1,11 @@
 import { describe, expect, it, vi } from 'vitest';
 import { withTestEnv } from '@/shared/test/withTestEnv';
-import type { UserItem } from '@/functions/login/types';
+import type { UserItem } from '@/shared/types/userItem';
 
 const TEST_ENV = {
   JWT_SECRET: 'test-secret',
   USERS_TABLE_NAME: 'Users',
+  MATCHES_TABLE_NAME: 'Matches',
 };
 
 vi.mock('@/shared/dynamo/getItem', () => ({
@@ -70,41 +71,6 @@ describe('getCurrentUser', () => {
         code: 'NOT_FOUND',
         message: 'Usuario no encontrado.',
       });
-    });
-  });
-});
-
-describe('mapUserToCurrentUserResponse', () => {
-  it('maps username and uses username as alias fallback when alias is missing', async () => {
-    const { mapUserToCurrentUserResponse } = await import('./getCurrentUser');
-
-    expect(
-      mapUserToCurrentUserResponse({
-        username: 'demo',
-        password: 'secret',
-      }),
-    ).toEqual({
-      username: 'demo',
-      alias: 'demo',
-      score: 0,
-      rankingPosition: 0,
-    });
-  });
-
-  it('maps rankingPosition from user item', async () => {
-    const { mapUserToCurrentUserResponse } = await import('./getCurrentUser');
-
-    expect(
-      mapUserToCurrentUserResponse({
-        username: 'demo',
-        password: 'secret',
-        rankingPosition: 5,
-      }),
-    ).toEqual({
-      username: 'demo',
-      alias: 'demo',
-      score: 0,
-      rankingPosition: 5,
     });
   });
 });

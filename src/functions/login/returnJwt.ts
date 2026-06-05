@@ -1,9 +1,10 @@
-import { createJwt } from './createJwt';
 import { environment } from '@/shared/config/environment';
 import { getItem } from '@/shared/dynamo/getItem';
 import { UnauthorizedError } from '@/shared/errors/UnauthorizedError';
+import type { UserItem } from '@/shared/types/userItem';
 import { comparePassword } from './comparePassword';
-import type { LoginInput, LoginResponse, UserItem } from './types';
+import { createJwt } from './createJwt';
+import type { LoginInput, LoginResponse } from './types';
 
 const INVALID_CREDENTIALS_MESSAGE = 'Usuario o contraseña inválidos.';
 

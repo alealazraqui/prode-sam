@@ -3,11 +3,12 @@ import { describe, expect, it, vi } from 'vitest';
 import { mockApiGatewayEvent } from '@/shared/test/mockApiGatewayEvent';
 import { parseHttpResponseBody } from '@/shared/test/parseHttpResponseBody';
 import { withTestEnv } from '@/shared/test/withTestEnv';
-import type { UserItem } from '@/functions/login/types';
+import type { UserItem } from '@/shared/types/userItem';
 
 const TEST_ENV = {
   JWT_SECRET: 'test-secret',
   USERS_TABLE_NAME: 'Users',
+  MATCHES_TABLE_NAME: 'Matches',
 };
 
 const mockUser: UserItem = {

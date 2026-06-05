@@ -17,6 +17,7 @@ Globals:
       Variables:
         NODE_OPTIONS: --enable-source-maps
         USERS_TABLE_NAME: !Ref UsersTable
+        MATCHES_TABLE_NAME: !Ref MatchesTable
         JWT_SECRET: !Ref JwtSecret
 
 Resources:
@@ -60,6 +61,20 @@ Resources:
           AttributeType: S
       KeySchema:
         - AttributeName: username
+          KeyType: HASH
+
+  MatchesTable:
+    Type: AWS::DynamoDB::Table
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Delete
+    Properties:
+      TableName: Matches
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: matchId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: matchId
           KeyType: HASH
 
   JwtAuthorizerFunction:
@@ -160,12 +175,41 @@ Resources:
         Target: es2020
         Sourcemap: true
 
+  GetUsersFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: .
+      Handler: src/functions/get-users/handler.handler
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref UsersTable
+      Events:
+        GetUsersApi:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref ProdeHttpApi
+            Path: /users
+            Method: GET
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        EntryPoints:
+          - src/functions/get-users/handler.ts
+        Minify: true
+        Target: es2020
+        Sourcemap: true
+
 Outputs:
   UsersTableName:
     Description: DynamoDB Users table name (for seed scripts and Lambdas)
     Value: !Ref UsersTable
     Export:
       Name: !Sub '${AWS::StackName}-UsersTableName'
+  MatchesTableName:
+    Description: DynamoDB Matches table name (for seed scripts and Lambdas)
+    Value: !Ref MatchesTable
+    Export:
+      Name: !Sub '${AWS::StackName}-MatchesTableName'
   HttpApiUrl:
     Description: HTTP API base URL
     Value: !Sub 'https://${ProdeHttpApi}.execute-api.${AWS::Region}.amazonaws.com'

@@ -2,11 +2,12 @@ import jwt from 'jsonwebtoken';
 import { describe, expect, it, vi } from 'vitest';
 import { UnauthorizedError } from '@/shared/errors/UnauthorizedError';
 import { withTestEnv } from '@/shared/test/withTestEnv';
-import type { UserItem } from './types';
+import type { UserItem } from '@/shared/types/userItem';
 
 const TEST_ENV = {
   JWT_SECRET: 'test-secret',
   USERS_TABLE_NAME: 'Users',
+  MATCHES_TABLE_NAME: 'Matches',
 };
 
 const mockUser: UserItem = {

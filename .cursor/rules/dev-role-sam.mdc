@@ -34,12 +34,13 @@ src/
   shared/
     http/                 → createHttpResponse, parseJsonBody
     errors/               → AppError + errores específicos + handleError
-    dynamo/               → dynamoClient + helpers genéricos (getItem, putItem, ...)
+    dynamo/               → dynamoClient + helpers genéricos (getItem, putItem, scanTable, ...)
     config/               → environment.ts (lectura de env vars)
     validation/           → typeValidation (guards reutilizables para unknown → tipos)
     auth/                 → verifyJwt, jwtPayload (tipo compartido del token)
+    types/                → tipos reutilizados por 2+ Lambdas (ej. UserItem, PublicUserResponse)
+    mappers/              → transformaciones reutilizadas por 2+ Lambdas (ej. UserItem → respuesta API)
     test/                 → helpers reutilizables para tests (mockApiGatewayEvent, withTestEnv, ...)
-    types/                → tipos transversales
   scripts/
     seed-users/           → carga manual de usuarios (no es Lambda)
 template.yaml             → API, Lambdas, tablas, IAM, env vars
@@ -60,6 +61,24 @@ No asumir el profile `default`. Si falla autenticación, verificar credenciales 
 
 Detalle: `docs/architecture.md` § 5.1.
 
+## Cuándo va en `shared/` (criterio de reutilización)
+
+Aplicar cuando el **mismo** tipo, mapper o función/helper lo usan **dos o más Lambdas** (`src/functions/<caso>/` distintas). No duplicar ni importar eso desde otra Lambda.
+
+| Qué | Dónde en `shared/` |
+|-----|-------------------|
+| Interfaces/types de persistencia o contrato API compartido | `shared/types/` |
+| Mappers / transformaciones puras compartidas | `shared/mappers/` |
+| Acceso DynamoDB, HTTP, errores, auth, config | carpetas existentes (`dynamo/`, `http/`, …) |
+
+Mientras **solo una** Lambda lo use → queda en `functions/<caso>/` (p. ej. `types.ts` del endpoint).
+
+**Prohibido:** `shared/` importando desde `functions/` (los tipos compartidos se mueven a `shared/types/`, no al revés).
+
+**No va en `shared/`:** lógica de negocio del Prode usada por una sola Lambda (reglas de ranking, validaciones de un endpoint, etc.).
+
+Detalle y ejemplos: `docs/architecture.md` § 11.
+
 ## Estilo de cada Lambda
 
 - `handler.ts` pequeño y declarativo: recibe evento → parsea input → ejecuta pasos → respuesta HTTP estandarizada → delega errores a `handleError`.
@@ -70,7 +89,7 @@ Detalle: `docs/architecture.md` § 5.1.
 - Estilo funcional y pragmático: handlers chicos, un paso claro por función, nombres descriptivos.
 - Evitar clases salvo valor real (excepción: jerarquía de errores `AppError`).
 - Priorizar funciones puras; evitar estado mutable innecesario.
-- Mantener el código relacionado cerca de su Lambda. Extraer a `shared/` solo lo verdaderamente transversal.
+- Mantener el código del caso de uso cerca de su Lambda; centralizar en `shared/` según el criterio de reutilización (≥2 Lambdas).
 - **No** poner lógica de negocio del Prode en `shared/` (ej: `calculateLeaderboard`) — vive cerca de su Lambda.
 - Evitar abstracciones genéricas prematuras y arquitectura por capas si complica.
 - Un único `template.yaml`. Sin Lambda Layer en el MVP. `CodeUri: .` para imports desde `src/shared/`.

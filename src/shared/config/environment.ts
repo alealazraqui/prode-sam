@@ -10,5 +10,6 @@ function getRequiredEnv(name: string): string {
 
 export const environment = {
   usersTableName: getRequiredEnv('USERS_TABLE_NAME'),
+  matchesTableName: getRequiredEnv('MATCHES_TABLE_NAME'),
   jwtSecret: getRequiredEnv('JWT_SECRET'),
 };
