@@ -124,6 +124,24 @@
         "AWS_PROFILE": "prode-dev"
       },
       "skipFiles": ["<node_internals>/**"]
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Get predictions",
+      "program": "${workspaceFolder}/scripts/debug-invoke.ts",
+      "args": ["get-predictions", "${input:get_predictions_invocation}"],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "runtimeArgs": ["-r", "tsx/cjs/register"],
+      "envFile": "${workspaceFolder}/.env.local",
+      "env": {
+        "USERS_TABLE_NAME": "Users",
+        "MATCHES_TABLE_NAME": "Matches",
+        "PREDICTIONS_TABLE_NAME": "Predictions",
+        "AWS_PROFILE": "prode-dev"
+      },
+      "skipFiles": ["<node_internals>/**"]
     }
   ],
   "inputs": [
@@ -173,6 +191,15 @@
         { "label": "Listado de partidos", "value": "get-matches-success" }
       ],
       "default": "get-matches-success"
+    },
+    {
+      "id": "get_predictions_invocation",
+      "type": "pickString",
+      "description": "Get predictions: invocacion a ejecutar",
+      "options": [
+        { "label": "Listado de predicciones", "value": "get-predictions-success" }
+      ],
+      "default": "get-predictions-success"
     }
   ]
 }

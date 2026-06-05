@@ -7,6 +7,7 @@ const TEST_ENV = {
   JWT_SECRET: 'test-secret',
   USERS_TABLE_NAME: 'Users',
   MATCHES_TABLE_NAME: 'Matches',
+  PREDICTIONS_TABLE_NAME: 'Predictions',
 };
 
 vi.mock('@/shared/auth/verifyJwt', () => ({

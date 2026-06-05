@@ -1,73 +1,73 @@
 matchId,homeTeamName,homeTeamCode,awayTeamName,awayTeamCode,homeGoals,awayGoals,kickoffAt,status,isFirstRound
-wc26-m001,Mexico,MEX,South Africa,RSA,,,2026-06-11T19:00:00Z,1,true
-wc26-m002,Korea Republic,KOR,Czechia,CZE,,,2026-06-11T22:00:00Z,1,true
-wc26-m003,Canada,CAN,Bosnia and Herzegovina,BIH,,,2026-06-12T19:00:00Z,1,true
-wc26-m004,United States,USA,Paraguay,PAR,,,2026-06-13T01:00:00Z,1,true
-wc26-m005,Haiti,HAI,Scotland,SCO,,,2026-06-13T19:00:00Z,1,true
-wc26-m006,Australia,AUS,Turkey,TUR,,,2026-06-13T22:00:00Z,1,true
-wc26-m007,Brazil,BRA,Morocco,MAR,,,2026-06-13T22:00:00Z,1,true
-wc26-m008,Qatar,QAT,Switzerland,SUI,,,2026-06-14T01:00:00Z,1,true
-wc26-m009,Germany,GER,Curaçao,CUW,,,2026-06-14T17:00:00Z,1,true
-wc26-m010,Ivory Coast,CIV,Ecuador,ECU,,,2026-06-14T19:00:00Z,1,true
-wc26-m011,Netherlands,NED,Japan,JPN,,,2026-06-14T20:00:00Z,1,true
-wc26-m012,Sweden,SWE,Tunisia,TUN,,,2026-06-14T23:00:00Z,1,true
-wc26-m013,Belgium,BEL,Egypt,EGY,,,2026-06-15T19:00:00Z,1,true
-wc26-m014,Iran,IRN,New Zealand,NZL,,,2026-06-15T22:00:00Z,1,true
-wc26-m015,Spain,ESP,Cape Verde,CPV,,,2026-06-15T22:00:00Z,1,true
-wc26-m016,Saudi Arabia,KSA,Uruguay,URU,,,2026-06-16T01:00:00Z,1,true
-wc26-m017,France,FRA,Senegal,SEN,,,2026-06-16T17:00:00Z,1,true
-wc26-m018,Iraq,IRQ,Norway,NOR,,,2026-06-16T20:00:00Z,1,true
-wc26-m019,Argentina,ARG,Algeria,ALG,,,2026-06-16T20:00:00Z,1,true
-wc26-m020,Austria,AUT,Jordan,JOR,,,2026-06-16T23:00:00Z,1,true
-wc26-m021,Portugal,POR,DR Congo,COD,,,2026-06-17T17:00:00Z,1,true
-wc26-m022,Uzbekistan,UZB,Colombia,COL,,,2026-06-17T19:00:00Z,1,true
-wc26-m023,England,ENG,Croatia,CRO,,,2026-06-17T20:00:00Z,1,true
-wc26-m024,Ghana,GHA,Panama,PAN,,,2026-06-17T23:00:00Z,1,true
-wc26-m025,Czechia,CZE,South Africa,RSA,,,2026-06-18T19:00:00Z,1,true
-wc26-m026,Mexico,MEX,Korea Republic,KOR,,,2026-06-18T22:00:00Z,1,true
-wc26-m027,Switzerland,SUI,Bosnia and Herzegovina,BIH,,,2026-06-18T19:00:00Z,1,true
-wc26-m028,Canada,CAN,Qatar,QAT,,,2026-06-18T22:00:00Z,1,true
-wc26-m029,Scotland,SCO,Morocco,MAR,,,2026-06-19T19:00:00Z,1,true
-wc26-m030,Brazil,BRA,Haiti,HAI,,,2026-06-19T22:00:00Z,1,true
-wc26-m031,United States,USA,Australia,AUS,,,2026-06-19T22:00:00Z,1,true
-wc26-m032,Turkey,TUR,Paraguay,PAR,,,2026-06-20T01:00:00Z,1,true
-wc26-m033,Germany,GER,Ivory Coast,CIV,,,2026-06-20T19:00:00Z,1,true
-wc26-m034,Ecuador,ECU,Curaçao,CUW,,,2026-06-20T20:00:00Z,1,true
-wc26-m035,Netherlands,NED,Sweden,SWE,,,2026-06-20T23:00:00Z,1,true
-wc26-m036,Tunisia,TUN,Japan,JPN,,,2026-06-21T04:00:00Z,1,true
-wc26-m037,Belgium,BEL,Iran,IRN,,,2026-06-21T19:00:00Z,1,true
-wc26-m038,New Zealand,NZL,Egypt,EGY,,,2026-06-21T22:00:00Z,1,true
-wc26-m039,Spain,ESP,Saudi Arabia,KSA,,,2026-06-21T22:00:00Z,1,true
-wc26-m040,Uruguay,URU,Cape Verde,CPV,,,2026-06-22T01:00:00Z,1,true
-wc26-m041,France,FRA,Iraq,IRQ,,,2026-06-22T17:00:00Z,1,true
-wc26-m042,Norway,NOR,Senegal,SEN,,,2026-06-22T20:00:00Z,1,true
-wc26-m043,Argentina,ARG,Austria,AUT,,,2026-06-22T20:00:00Z,1,true
-wc26-m044,Jordan,JOR,Algeria,ALG,,,2026-06-22T23:00:00Z,1,true
-wc26-m045,Portugal,POR,Uzbekistan,UZB,,,2026-06-23T17:00:00Z,1,true
-wc26-m046,Colombia,COL,DR Congo,COD,,,2026-06-23T20:00:00Z,1,true
-wc26-m047,England,ENG,Ghana,GHA,,,2026-06-23T20:00:00Z,1,true
-wc26-m048,Panama,PAN,Croatia,CRO,,,2026-06-23T23:00:00Z,1,true
-wc26-m049,Czechia,CZE,Mexico,MEX,,,2026-06-24T21:00:00Z,1,true
-wc26-m050,South Africa,RSA,Korea Republic,KOR,,,2026-06-24T21:00:00Z,1,true
-wc26-m051,Switzerland,SUI,Canada,CAN,,,2026-06-24T19:00:00Z,1,true
-wc26-m052,Bosnia and Herzegovina,BIH,Qatar,QAT,,,2026-06-24T19:00:00Z,1,true
-wc26-m053,Scotland,SCO,Brazil,BRA,,,2026-06-24T22:00:00Z,1,true
-wc26-m054,Morocco,MAR,Haiti,HAI,,,2026-06-24T22:00:00Z,1,true
-wc26-m055,Turkey,TUR,United States,USA,,,2026-06-25T21:00:00Z,1,true
-wc26-m056,Paraguay,PAR,Australia,AUS,,,2026-06-25T21:00:00Z,1,true
-wc26-m057,Curaçao,CUW,Ivory Coast,CIV,,,2026-06-25T19:00:00Z,1,true
-wc26-m058,Ecuador,ECU,Germany,GER,,,2026-06-25T19:00:00Z,1,true
-wc26-m059,Japan,JPN,Sweden,SWE,,,2026-06-25T22:00:00Z,1,true
-wc26-m060,Tunisia,TUN,Netherlands,NED,,,2026-06-25T22:00:00Z,1,true
-wc26-m061,Egypt,EGY,Iran,IRN,,,2026-06-26T21:00:00Z,1,true
-wc26-m062,New Zealand,NZL,Belgium,BEL,,,2026-06-26T21:00:00Z,1,true
-wc26-m063,Cape Verde,CPV,Saudi Arabia,KSA,,,2026-06-26T19:00:00Z,1,true
-wc26-m064,Uruguay,URU,Spain,ESP,,,2026-06-26T22:00:00Z,1,true
-wc26-m065,Norway,NOR,France,FRA,,,2026-06-26T22:00:00Z,1,true
-wc26-m066,Senegal,SEN,Iraq,IRQ,,,2026-06-26T22:00:00Z,1,true
-wc26-m067,Algeria,ALG,Austria,AUT,,,2026-06-27T21:00:00Z,1,true
-wc26-m068,Jordan,JOR,Argentina,ARG,,,2026-06-27T21:00:00Z,1,true
-wc26-m069,Colombia,COL,Portugal,POR,,,2026-06-27T19:00:00Z,1,true
-wc26-m070,DR Congo,COD,Uzbekistan,UZB,,,2026-06-27T19:00:00Z,1,true
-wc26-m071,Panama,PAN,England,ENG,,,2026-06-27T22:00:00Z,1,true
-wc26-m072,Croatia,CRO,Ghana,GHA,,,2026-06-27T22:00:00Z,1,true
+wc26-m001,México,MEX,Sudáfrica,RSA,,,2026-06-11T19:00:00Z,1,true
+wc26-m002,Corea del Sur,KOR,República Checa,CZE,,,2026-06-12T02:00:00Z,1,true
+wc26-m003,Canadá,CAN,Bosnia y Herzegovina,BIH,,,2026-06-12T19:00:00Z,1,true
+wc26-m004,Estados Unidos,USA,Paraguay,PAR,,,2026-06-13T01:00:00Z,1,true
+wc26-m005,Haití,HAI,Escocia,SCO,,,2026-06-14T01:00:00Z,1,true
+wc26-m006,Australia,AUS,Turquía,TUR,,,2026-06-14T04:00:00Z,1,true
+wc26-m007,Brasil,BRA,Marruecos,MAR,,,2026-06-13T22:00:00Z,1,true
+wc26-m008,Catar,QAT,Suiza,SUI,,,2026-06-13T19:00:00Z,1,true
+wc26-m009,Costa de Marfil,CIV,Ecuador,ECU,,,2026-06-14T23:00:00Z,1,true
+wc26-m010,Alemania,GER,Curazao,CUW,,,2026-06-14T17:00:00Z,1,true
+wc26-m011,Países Bajos,NED,Japón,JPN,,,2026-06-14T20:00:00Z,1,true
+wc26-m012,Suecia,SWE,Túnez,TUN,,,2026-06-15T02:00:00Z,1,true
+wc26-m013,Arabia Saudita,KSA,Uruguay,URU,,,2026-06-15T22:00:00Z,1,true
+wc26-m014,España,ESP,Cabo Verde,CPV,,,2026-06-15T16:00:00Z,1,true
+wc26-m015,Irán,IRN,Nueva Zelanda,NZL,,,2026-06-16T01:00:00Z,1,true
+wc26-m016,Bélgica,BEL,Egipto,EGY,,,2026-06-15T19:00:00Z,1,true
+wc26-m017,Francia,FRA,Senegal,SEN,,,2026-06-16T19:00:00Z,1,true
+wc26-m018,Irak,IRQ,Noruega,NOR,,,2026-06-16T22:00:00Z,1,true
+wc26-m019,Argentina,ARG,Argelia,ALG,,,2026-06-17T01:00:00Z,1,true
+wc26-m020,Austria,AUT,Jordania,JOR,,,2026-06-17T04:00:00Z,1,true
+wc26-m021,Ghana,GHA,Panamá,PAN,,,2026-06-17T23:00:00Z,1,true
+wc26-m022,Inglaterra,ENG,Croacia,CRO,,,2026-06-17T20:00:00Z,1,true
+wc26-m023,Portugal,POR,RD Congo,COD,,,2026-06-17T17:00:00Z,1,true
+wc26-m024,Uzbekistán,UZB,Colombia,COL,,,2026-06-18T02:00:00Z,1,true
+wc26-m025,República Checa,CZE,Sudáfrica,RSA,,,2026-06-18T16:00:00Z,1,true
+wc26-m026,Suiza,SUI,Bosnia y Herzegovina,BIH,,,2026-06-18T19:00:00Z,1,true
+wc26-m027,Canadá,CAN,Catar,QAT,,,2026-06-18T22:00:00Z,1,true
+wc26-m028,México,MEX,Corea del Sur,KOR,,,2026-06-19T01:00:00Z,1,true
+wc26-m029,Brasil,BRA,Haití,HAI,,,2026-06-20T01:00:00Z,1,true
+wc26-m030,Escocia,SCO,Marruecos,MAR,,,2026-06-19T22:00:00Z,1,true
+wc26-m031,Turquía,TUR,Paraguay,PAR,,,2026-06-20T03:00:00Z,1,true
+wc26-m032,Estados Unidos,USA,Australia,AUS,,,2026-06-19T19:00:00Z,1,true
+wc26-m033,Alemania,GER,Costa de Marfil,CIV,,,2026-06-20T20:00:00Z,1,true
+wc26-m034,Ecuador,ECU,Curazao,CUW,,,2026-06-21T00:00:00Z,1,true
+wc26-m035,Países Bajos,NED,Suecia,SWE,,,2026-06-20T17:00:00Z,1,true
+wc26-m036,Túnez,TUN,Japón,JPN,,,2026-06-20T04:00:00Z,1,true
+wc26-m037,Uruguay,URU,Cabo Verde,CPV,,,2026-06-21T22:00:00Z,1,true
+wc26-m038,España,ESP,Arabia Saudita,KSA,,,2026-06-21T16:00:00Z,1,true
+wc26-m039,Bélgica,BEL,Irán,IRN,,,2026-06-21T19:00:00Z,1,true
+wc26-m040,Nueva Zelanda,NZL,Egipto,EGY,,,2026-06-22T01:00:00Z,1,true
+wc26-m041,Noruega,NOR,Senegal,SEN,,,2026-06-23T00:00:00Z,1,true
+wc26-m042,Francia,FRA,Irak,IRQ,,,2026-06-22T21:00:00Z,1,true
+wc26-m043,Argentina,ARG,Austria,AUT,,,2026-06-22T17:00:00Z,1,true
+wc26-m044,Jordania,JOR,Argelia,ALG,,,2026-06-23T03:00:00Z,1,true
+wc26-m045,Inglaterra,ENG,Ghana,GHA,,,2026-06-23T20:00:00Z,1,true
+wc26-m046,Panamá,PAN,Croacia,CRO,,,2026-06-23T23:00:00Z,1,true
+wc26-m047,Portugal,POR,Uzbekistán,UZB,,,2026-06-23T17:00:00Z,1,true
+wc26-m048,Colombia,COL,RD Congo,COD,,,2026-06-24T02:00:00Z,1,true
+wc26-m049,Escocia,SCO,Brasil,BRA,,,2026-06-24T22:00:00Z,1,true
+wc26-m050,Marruecos,MAR,Haití,HAI,,,2026-06-24T22:00:00Z,1,true
+wc26-m051,Suiza,SUI,Canadá,CAN,,,2026-06-24T19:00:00Z,1,true
+wc26-m052,Bosnia y Herzegovina,BIH,Catar,QAT,,,2026-06-24T19:00:00Z,1,true
+wc26-m053,República Checa,CZE,México,MEX,,,2026-06-25T01:00:00Z,1,true
+wc26-m054,Sudáfrica,RSA,Corea del Sur,KOR,,,2026-06-25T01:00:00Z,1,true
+wc26-m055,Curazao,CUW,Costa de Marfil,CIV,,,2026-06-25T20:00:00Z,1,true
+wc26-m056,Ecuador,ECU,Alemania,GER,,,2026-06-25T20:00:00Z,1,true
+wc26-m057,Japón,JPN,Suecia,SWE,,,2026-06-25T23:00:00Z,1,true
+wc26-m058,Túnez,TUN,Países Bajos,NED,,,2026-06-25T23:00:00Z,1,true
+wc26-m059,Turquía,TUR,Estados Unidos,USA,,,2026-06-26T02:00:00Z,1,true
+wc26-m060,Paraguay,PAR,Australia,AUS,,,2026-06-26T02:00:00Z,1,true
+wc26-m061,Noruega,NOR,Francia,FRA,,,2026-06-26T19:00:00Z,1,true
+wc26-m062,Senegal,SEN,Irak,IRQ,,,2026-06-26T19:00:00Z,1,true
+wc26-m063,Egipto,EGY,Irán,IRN,,,2026-06-27T03:00:00Z,1,true
+wc26-m064,Nueva Zelanda,NZL,Bélgica,BEL,,,2026-06-27T03:00:00Z,1,true
+wc26-m065,Cabo Verde,CPV,Arabia Saudita,KSA,,,2026-06-27T00:00:00Z,1,true
+wc26-m066,Uruguay,URU,España,ESP,,,2026-06-27T00:00:00Z,1,true
+wc26-m067,Panamá,PAN,Inglaterra,ENG,,,2026-06-27T21:00:00Z,1,true
+wc26-m068,Croacia,CRO,Ghana,GHA,,,2026-06-27T21:00:00Z,1,true
+wc26-m069,Argelia,ALG,Austria,AUT,,,2026-06-28T02:00:00Z,1,true
+wc26-m070,Jordania,JOR,Argentina,ARG,,,2026-06-28T02:00:00Z,1,true
+wc26-m071,Colombia,COL,Portugal,POR,,,2026-06-27T23:30:00Z,1,true
+wc26-m072,RD Congo,COD,Uzbekistán,UZB,,,2026-06-27T23:30:00Z,1,true
