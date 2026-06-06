@@ -1,0 +1,7 @@
+matchId,homeTeamName,homeTeamCode,awayTeamName,awayTeamCode,homeGoals,awayGoals,kickoffAt,status,isFirstRound
+mock-m001,Argentina,ARG,Brasil,BRA,2,1,2026-05-30T20:00:00Z,2,true
+mock-m002,Francia,FRA,Alemania,GER,0,0,2026-06-01T18:00:00Z,2,true
+mock-m003,España,ESP,Portugal,POR,,,2026-06-15T20:00:00Z,1,true
+mock-m004,Inglaterra,ENG,Italia,ITA,,,2026-06-20T18:00:00Z,1,true
+mock-m005,Uruguay,URU,Colombia,COL,1,0,2026-05-30T15:00:00Z,2,true
+mock-m006,Ecuador,ECU,Perú,PER,2,2,2026-05-30T18:00:00Z,2,true

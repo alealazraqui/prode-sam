@@ -8,6 +8,7 @@
     "typecheck": "tsc --noEmit",
     "seed:users": "tsx scripts/seed-users/seed-users.ts",
     "seed:matches": "tsx scripts/seed-matches/seed-matches.ts",
+    "seed:predictions": "tsx scripts/seed-predictions/seed-predictions.ts",
     "test": "vitest run",
     "test:watch": "vitest",
     "format": "prettier --write \"src/**/*.ts\" \"scripts/**/*.ts\"",
