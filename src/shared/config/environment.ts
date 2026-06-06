@@ -12,5 +12,6 @@ export const environment = {
   usersTableName: getRequiredEnv('USERS_TABLE_NAME'),
   matchesTableName: getRequiredEnv('MATCHES_TABLE_NAME'),
   predictionsTableName: getRequiredEnv('PREDICTIONS_TABLE_NAME'),
+  dayEventsTableName: getRequiredEnv('DAY_EVENTS_TABLE_NAME'),
   jwtSecret: getRequiredEnv('JWT_SECRET'),
 };

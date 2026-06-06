@@ -1,0 +1,95 @@
+---
+description: Cargar resultados de partidos e invocar UploadMatchesFunction con confirmacion obligatoria del usuario. Usar cuando el usuario pide subir resultados, recalcular puntajes o invocar upload-matches.
+alwaysApply: false
+---
+
+# Invocar Lambda upload-matches (scoring)
+
+Guia al agente para cargar resultados y ejecutar `UploadMatchesFunction` de forma segura.
+
+## Prerrequisitos
+
+- Profile AWS: `prode-dev` (obligatorio).
+- Stack desplegado: `prode-sam` (`sam build` + `sam deploy` si falta `UploadMatchesFunction`).
+- Nombre logico en SAM: `UploadMatchesFunction`. El nombre fisico en AWS suele ser `prode-sam-UploadMatchesFunction-<suffix>`; resolverlo con `aws lambda list-functions` o CloudFormation antes de invocar.
+
+## Flujo obligatorio
+
+### 1. Elegir modo de entrada
+
+Preguntar al usuario:
+
+| Modo | Descripcion |
+|------|-------------|
+| **A** | Resultados en el chat (equipos + goles) |
+| **B** | Buscar resultados en internet (fecha/torneo indicados) |
+| **C** | Recalcular sin modificar partidos (`matches: []`) |
+
+### 2. Obtener matchIds de DynamoDB (modos A y B)
+
+```powershell
+$env:AWS_PROFILE = "prode-dev"
+aws dynamodb scan --table-name Matches --output json
+```
+
+Filtrar por fecha (`kickoffAt`) indicada o la de hoy. Extraer `matchId`, equipos (`homeTeamName`, `awayTeamName`) y `kickoffAt`.
+
+### 3. Mapear resultados a matchIds
+
+Cotejar resultados con partidos de DynamoDB por nombre de equipo y fecha. Si hay ambiguedad, marcarla con advertencia explicita.
+
+### 4. STOP OBLIGATORIO
+
+Mostrar el payload exacto en JSON:
+
+```json
+{
+  "matches": [
+    {
+      "matchId": "...",
+      "homeGoals": 2,
+      "awayGoals": 1,
+      "kickoffAt": "2026-06-01T18:00:00.000Z"
+    }
+  ]
+}
+```
+
+Para modo C: `{ "matches": [] }`.
+
+**No invocar sin confirmacion explicita del usuario.**
+
+### 5. Invocar la Lambda
+
+Tras aprobacion, resolver el nombre fisico de la funcion y ejecutar:
+
+```powershell
+$env:AWS_PROFILE = "prode-dev"
+# En PowerShell usar archivo payload (evita problemas de escape de JSON inline)
+# Ejemplo: tmp-invoke.json con {"matches":[...]} o {"matches":[]}
+aws lambda invoke `
+  --function-name <nombre-fisico-UploadMatchesFunction> `
+  --payload fileb://tmp-invoke.json `
+  --cli-binary-format raw-in-base64-out `
+  response.json
+Get-Content response.json
+```
+
+Resolver nombre fisico:
+
+```powershell
+aws lambda list-functions --query "Functions[?contains(FunctionName, 'UploadMatches')].FunctionName" --output text
+```
+
+Alternativa local (sin deploy): `sam local invoke UploadMatchesFunction -e src/functions/upload-matches/invocations/<archivo>.json --parameter-overrides JwtSecret=dev-secret-local`
+
+### 6. Verificar resultado
+
+- Respuesta esperada: `{"statusCode":200,"body":"{\"ok\":true}"}`.
+- Opcional: re-scan Predictions (`pointsCommon`) y Users (`score`, `rankingPosition`) para confirmar persistencia.
+
+## Reglas
+
+- Nunca invocar sin mostrar payload y obtener ok del usuario (salvo modo C si el usuario ya lo pidio explicitamente).
+- No usar secrets reales en el chat.
+- Si la funcion no existe en AWS, desplegar antes de invocar en cloud.

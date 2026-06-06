@@ -19,6 +19,7 @@ Globals:
         USERS_TABLE_NAME: !Ref UsersTable
         MATCHES_TABLE_NAME: !Ref MatchesTable
         PREDICTIONS_TABLE_NAME: !Ref PredictionsTable
+        DAY_EVENTS_TABLE_NAME: !Ref DayEventsTable
         JWT_SECRET: !Ref JwtSecret
 
 Resources:
@@ -95,6 +96,20 @@ Resources:
           KeyType: HASH
         - AttributeName: matchId
           KeyType: RANGE
+
+  DayEventsTable:
+    Type: AWS::DynamoDB::Table
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Delete
+    Properties:
+      TableName: DayEvents
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: date
+          AttributeType: S
+      KeySchema:
+        - AttributeName: date
+          KeyType: HASH
 
   JwtAuthorizerFunction:
     Type: AWS::Serverless::Function
@@ -292,6 +307,35 @@ Resources:
         Target: es2020
         Sourcemap: true
 
+  UploadMatchesFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: .
+      Handler: src/functions/upload-matches/handler.handler
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref MatchesTable
+        - DynamoDBWritePolicy:
+            TableName: !Ref MatchesTable
+        - DynamoDBReadPolicy:
+            TableName: !Ref PredictionsTable
+        - DynamoDBWritePolicy:
+            TableName: !Ref PredictionsTable
+        - DynamoDBReadPolicy:
+            TableName: !Ref UsersTable
+        - DynamoDBWritePolicy:
+            TableName: !Ref UsersTable
+        - DynamoDBReadPolicy:
+            TableName: !Ref DayEventsTable
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        EntryPoints:
+          - src/functions/upload-matches/handler.ts
+        Minify: true
+        Target: es2020
+        Sourcemap: true
+
 Outputs:
   UsersTableName:
     Description: DynamoDB Users table name (for seed scripts and Lambdas)
@@ -308,6 +352,11 @@ Outputs:
     Value: !Ref PredictionsTable
     Export:
       Name: !Sub '${AWS::StackName}-PredictionsTableName'
+  DayEventsTableName:
+    Description: DynamoDB DayEvents table name (for seed scripts and Lambdas)
+    Value: !Ref DayEventsTable
+    Export:
+      Name: !Sub '${AWS::StackName}-DayEventsTableName'
   HttpApiUrl:
     Description: HTTP API base URL
     Value: !Sub 'https://${ProdeHttpApi}.execute-api.${AWS::Region}.amazonaws.com'

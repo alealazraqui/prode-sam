@@ -8,6 +8,7 @@ const TEST_ENV = {
   USERS_TABLE_NAME: 'Users',
   MATCHES_TABLE_NAME: 'Matches',
   PREDICTIONS_TABLE_NAME: 'Predictions',
+  DAY_EVENTS_TABLE_NAME: 'DayEvents',
 };
 
 vi.mock('@/shared/auth/verifyJwt', () => ({

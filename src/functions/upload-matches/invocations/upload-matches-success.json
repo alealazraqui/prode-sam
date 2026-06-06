@@ -1,0 +1,10 @@
+{
+  "matches": [
+    {
+      "matchId": "mock-m001",
+      "homeGoals": 2,
+      "awayGoals": 1,
+      "kickoffAt": "2026-06-01T18:00:00.000Z"
+    }
+  ]
+}

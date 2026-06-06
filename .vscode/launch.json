@@ -142,6 +142,25 @@
         "AWS_PROFILE": "prode-dev"
       },
       "skipFiles": ["<node_internals>/**"]
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Upload matches",
+      "program": "${workspaceFolder}/scripts/debug-invoke.ts",
+      "args": ["upload-matches", "${input:upload_matches_invocation}"],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "runtimeArgs": ["-r", "tsx/cjs/register"],
+      "envFile": "${workspaceFolder}/.env.local",
+      "env": {
+        "USERS_TABLE_NAME": "Users",
+        "MATCHES_TABLE_NAME": "Matches",
+        "PREDICTIONS_TABLE_NAME": "Predictions",
+        "DAY_EVENTS_TABLE_NAME": "DayEvents",
+        "AWS_PROFILE": "prode-dev"
+      },
+      "skipFiles": ["<node_internals>/**"]
     }
   ],
   "inputs": [
@@ -200,6 +219,16 @@
         { "label": "Listado de predicciones", "value": "get-predictions-success" }
       ],
       "default": "get-predictions-success"
+    },
+    {
+      "id": "upload_matches_invocation",
+      "type": "pickString",
+      "description": "Upload matches: invocacion a ejecutar",
+      "options": [
+        { "label": "Cargar resultados y recalcular", "value": "upload-matches-success" },
+        { "label": "Recalcular sin modificar partidos", "value": "upload-matches-recalculate-only" }
+      ],
+      "default": "upload-matches-success"
     }
   ]
 }

@@ -7,6 +7,7 @@ const TEST_ENV = {
   USERS_TABLE_NAME: 'Users',
   MATCHES_TABLE_NAME: 'Matches',
   PREDICTIONS_TABLE_NAME: 'Predictions',
+  DAY_EVENTS_TABLE_NAME: 'DayEvents',
 };
 
 const FUTURE_KICKOFF = '2099-01-01T12:00:00.000Z';
