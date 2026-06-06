@@ -65,6 +65,13 @@ await withTestEnv({ JWT_SECRET: '...', USERS_TABLE_NAME: 'Users' }, async () => 
 });
 ```
 
+**`vi.resetModules()` e `instanceof`:** tras `resetModules()`, las clases importadas fuera del callback (ej. `BadRequestError`) pueden ser instancias distintas a las que usa `handleError` → el handler devuelve 500 en lugar del status esperado. Opciones:
+
+- Importar la clase de error **dentro** del callback de `withTestEnv`, despues de `resetModules`.
+- O assert con `toMatchObject({ statusCode, code, message })` en lugar de `toThrow(MiError)`.
+
+Si varios tests comparten mocks de I/O (`getItem`, `putItem`), usar `vi.clearAllMocks()` en `beforeEach` para evitar estado residual entre casos.
+
 ### Authorizer
 
 - Mock de `verifyJwt` para aislar extracción del Bearer token.

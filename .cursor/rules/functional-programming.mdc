@@ -116,3 +116,20 @@ Cada funcion pertenece a una sola capa. Una funcion de paso no llama a otra de p
 - Sin clases salvo jerarquia de errores (`AppError`). Funciones y tipos, no instancias.
 - Sin estado mutable innecesario. Preferir `const` y valores inmutables.
 - Parametros maximos recomendados: 3. Si se necesitan mas, agrupar en un objeto tipado.
+
+## I/O async sobre colecciones
+
+Cuando un paso ejecuta la **misma operacion async independiente** sobre cada elemento de un array (ej. varios `getItem` o `putItem` sin dependencia entre si), preferir estilo declarativo:
+
+```typescript
+await Promise.all(
+  items.map((item) => doAsyncWork(item)),
+);
+```
+
+Reservar `for await` secuencial para cuando:
+
+- Cada iteracion depende del resultado de la anterior.
+- Se necesita orden o side effects explicitos (logs por item, throttling).
+
+Referencia: `getPredictions` (lecturas paralelas), `fetchMatchesForPredictions` / `upsertPredictions` (batch DynamoDB).

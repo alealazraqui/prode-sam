@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import { BadRequestError } from './BadRequestError';
+import { ConflictError } from './ConflictError';
 import { NotFoundError } from './NotFoundError';
 import { UnauthorizedError } from './UnauthorizedError';
 import { handleError } from './handleError';
@@ -33,6 +34,16 @@ describe('handleError', () => {
     expect(parseHttpResponseBody(response.body)).toEqual({
       code: 'UNAUTHORIZED',
       message: 'Usuario o contraseña inválidos.',
+    });
+  });
+
+  it('maps ConflictError to 409', () => {
+    const response = handleError(new ConflictError('Predictions locked for matches: wc26-m001'));
+
+    expect(response.statusCode).toBe(409);
+    expect(parseHttpResponseBody(response.body)).toEqual({
+      code: 'CONFLICT',
+      message: 'Predictions locked for matches: wc26-m001',
     });
   });
 

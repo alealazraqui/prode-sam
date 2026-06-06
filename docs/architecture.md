@@ -234,6 +234,7 @@ backend/
         UnauthorizedError.ts
         ForbiddenError.ts
         NotFoundError.ts
+        ConflictError.ts
         handleError.ts
 
       dynamo/
@@ -475,6 +476,29 @@ export class NotFoundError extends AppError {
   }
 }
 ```
+
+```ts
+// src/shared/errors/ConflictError.ts
+
+import { AppError } from './AppError';
+
+export class ConflictError extends AppError {
+  constructor(message: string) {
+    super(message, 409, 'CONFLICT');
+  }
+}
+```
+
+### 12.2.1 Cuándo usar cada código HTTP
+
+| Código | Clase | Uso |
+|--------|-------|-----|
+| 400 | `BadRequestError` | Input inválido: JSON mal formado, campos faltantes, tipos incorrectos, recurso referenciado inexistente cuando es error del cliente. |
+| 401 | `UnauthorizedError` | Sin identidad válida (authorizer o handler protegido). |
+| 404 | `NotFoundError` | Recurso que el usuario intenta leer/actualizar y no existe en contexto de su operación. |
+| 409 | `ConflictError` | Conflicto de **estado de negocio**: la operación es válida en formato pero no aplica en el momento (ej. predicción lockeada porque `kickoffAt` ya pasó). |
+
+Regla práctica: validación de **formato/datos** → 400; regla de **negocio / timing / lock** → 409.
 
 ---
 
