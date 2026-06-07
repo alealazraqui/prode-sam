@@ -265,6 +265,8 @@ Resources:
       Policies:
         - DynamoDBReadPolicy:
             TableName: !Ref PredictionsTable
+        - DynamoDBReadPolicy:
+            TableName: !Ref UsersTable
       Events:
         GetPredictionsApi:
           Type: HttpApi

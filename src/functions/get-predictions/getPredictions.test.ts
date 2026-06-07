@@ -18,6 +18,15 @@ vi.mock('./fetchOthersPredictions', () => ({
   fetchOthersPredictions: vi.fn(),
 }));
 
+vi.mock('@/shared/dynamo/scanTable', () => ({
+  scanTable: vi.fn(),
+}));
+
+const mockUsers = [
+  { username: 'user1', alias: 'User One', password: 'hash' },
+  { username: 'other-user', password: 'hash' },
+];
+
 const ownFutureKickoff: PredictionItem = {
   username: 'user1',
   matchId: 'wc26-m002',
@@ -61,8 +70,10 @@ describe('getPredictions', () => {
       vi.resetModules();
       const { fetchMyPredictions } = await import('./fetchMyPredictions');
       const { fetchOthersPredictions } = await import('./fetchOthersPredictions');
+      const { scanTable } = await import('@/shared/dynamo/scanTable');
       vi.mocked(fetchMyPredictions).mockResolvedValue([ownFutureKickoff, ownPastKickoff]);
       vi.mocked(fetchOthersPredictions).mockResolvedValue([]);
+      vi.mocked(scanTable).mockResolvedValue(mockUsers);
 
       const { getPredictions } = await import('./getPredictions');
       const result = await getPredictions('user1');
@@ -70,6 +81,7 @@ describe('getPredictions', () => {
       expect(result.myPredictions).toEqual([
         {
           username: 'user1',
+          alias: 'User One',
           matchId: 'wc26-m002',
           homeGoals: 1,
           awayGoals: 1,
@@ -78,6 +90,7 @@ describe('getPredictions', () => {
         },
         {
           username: 'user1',
+          alias: 'User One',
           matchId: 'wc26-m001',
           homeGoals: 2,
           awayGoals: 0,
@@ -93,8 +106,10 @@ describe('getPredictions', () => {
       vi.resetModules();
       const { fetchMyPredictions } = await import('./fetchMyPredictions');
       const { fetchOthersPredictions } = await import('./fetchOthersPredictions');
+      const { scanTable } = await import('@/shared/dynamo/scanTable');
       vi.mocked(fetchMyPredictions).mockResolvedValue([ownPastKickoff]);
       vi.mocked(fetchOthersPredictions).mockResolvedValue([]);
+      vi.mocked(scanTable).mockResolvedValue(mockUsers);
 
       const { getPredictions } = await import('./getPredictions');
       const result = await getPredictions('user1');
@@ -102,6 +117,7 @@ describe('getPredictions', () => {
       expect(result.allPredictions).toEqual([
         {
           username: 'user1',
+          alias: 'User One',
           matchId: 'wc26-m001',
           homeGoals: 2,
           awayGoals: 0,
@@ -117,8 +133,10 @@ describe('getPredictions', () => {
       vi.resetModules();
       const { fetchMyPredictions } = await import('./fetchMyPredictions');
       const { fetchOthersPredictions } = await import('./fetchOthersPredictions');
+      const { scanTable } = await import('@/shared/dynamo/scanTable');
       vi.mocked(fetchMyPredictions).mockResolvedValue([ownPastKickoff]);
       vi.mocked(fetchOthersPredictions).mockResolvedValue([otherPastKickoff]);
+      vi.mocked(scanTable).mockResolvedValue(mockUsers);
 
       const { getPredictions } = await import('./getPredictions');
       const result = await getPredictions('user1');
@@ -126,6 +144,7 @@ describe('getPredictions', () => {
       expect(result.allPredictions).toEqual([
         {
           username: 'user1',
+          alias: 'User One',
           matchId: 'wc26-m001',
           homeGoals: 2,
           awayGoals: 0,
@@ -134,6 +153,7 @@ describe('getPredictions', () => {
         },
         {
           username: 'other-user',
+          alias: 'other-user',
           matchId: 'wc26-m001',
           homeGoals: 1,
           awayGoals: 1,
@@ -149,8 +169,10 @@ describe('getPredictions', () => {
       vi.resetModules();
       const { fetchMyPredictions } = await import('./fetchMyPredictions');
       const { fetchOthersPredictions } = await import('./fetchOthersPredictions');
+      const { scanTable } = await import('@/shared/dynamo/scanTable');
       vi.mocked(fetchMyPredictions).mockResolvedValue([]);
       vi.mocked(fetchOthersPredictions).mockResolvedValue([ownPastKickoff, otherWithoutPoints]);
+      vi.mocked(scanTable).mockResolvedValue(mockUsers);
 
       const { getPredictions } = await import('./getPredictions');
       const result = await getPredictions('user1');
@@ -158,6 +180,7 @@ describe('getPredictions', () => {
       expect(result.allPredictions).toEqual([
         {
           username: 'user1',
+          alias: 'User One',
           matchId: 'wc26-m001',
           homeGoals: 2,
           awayGoals: 0,
@@ -166,6 +189,7 @@ describe('getPredictions', () => {
         },
         {
           username: 'other-user',
+          alias: 'other-user',
           matchId: 'wc26-m003',
           homeGoals: 0,
           awayGoals: 0,

@@ -11,6 +11,9 @@ try {
 }
 
 process.env.USERS_TABLE_NAME ??= 'Users';
+process.env.MATCHES_TABLE_NAME ??= 'Matches';
+process.env.PREDICTIONS_TABLE_NAME ??= 'Predictions';
+process.env.DAY_EVENTS_TABLE_NAME ??= 'DayEvents';
 
 async function main(): Promise<void> {
   const [caseName, invocationName] = process.argv.slice(2);

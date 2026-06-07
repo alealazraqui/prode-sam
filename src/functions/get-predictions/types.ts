@@ -1,5 +1,6 @@
 export type PredictionResponse = {
   username: string;
+  alias: string;
   matchId: string;
   homeGoals: number;
   awayGoals: number;
