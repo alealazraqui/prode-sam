@@ -372,11 +372,11 @@ Resources:
         Target: es2020
         Sourcemap: true
 
-  GetStealDayFunction:
+  GetEventTypeFunction:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: .
-      Handler: src/functions/get-steal-day/handler.handler
+      Handler: src/functions/get-event-type/handler.handler
       Policies:
         - DynamoDBReadPolicy:
             TableName: !Ref StealersTable
@@ -385,17 +385,17 @@ Resources:
         - DynamoDBReadPolicy:
             TableName: !Ref DayEventsTable
       Events:
-        GetStealDayApi:
+        GetEventTypeApi:
           Type: HttpApi
           Properties:
             ApiId: !Ref ProdeHttpApi
-            Path: /steal-day
+            Path: /event-type
             Method: GET
     Metadata:
       BuildMethod: esbuild
       BuildProperties:
         EntryPoints:
-          - src/functions/get-steal-day/handler.ts
+          - src/functions/get-event-type/handler.ts
         Minify: true
         Target: es2020
         Sourcemap: true

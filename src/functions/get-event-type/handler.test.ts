@@ -3,7 +3,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { mockApiGatewayEvent } from '@/shared/test/mockApiGatewayEvent';
 import { parseHttpResponseBody } from '@/shared/test/parseHttpResponseBody';
 import { withTestEnv } from '@/shared/test/withTestEnv';
-import type { StealDayResponse } from './types';
+import type { EventTypeResponse } from './types';
 
 const TEST_ENV = {
   JWT_SECRET: 'test-secret',
@@ -15,63 +15,61 @@ const TEST_ENV = {
   BLOCKED_VICTIMS_TABLE_NAME: 'BlockedVictims',
 };
 
-vi.mock('./getStealDay', () => ({
-  getStealDay: vi.fn(),
+vi.mock('./getEventType', () => ({
+  getEventType: vi.fn(),
 }));
 
-describe('get-steal-day handler', () => {
-  it('returns 200 with empty steal context on a common day', async () => {
+describe('get-event-type handler', () => {
+  it('returns 200 with event type context on a common day', async () => {
     await withTestEnv(TEST_ENV, async () => {
       vi.resetModules();
-      const { getStealDay } = await import('./getStealDay');
+      const { getEventType } = await import('./getEventType');
       const { handler } = await import('./handler');
 
-      const stealDay: StealDayResponse = {
+      const eventTypeResponse: EventTypeResponse = {
         eventType: 'common',
-        stealers: [],
-        blockedUsernames: [],
         currentUserIsSteal: false,
+        blockedUsernames: [],
       };
-      vi.mocked(getStealDay).mockResolvedValue(stealDay);
+      vi.mocked(getEventType).mockResolvedValue(eventTypeResponse);
 
       const event = mockApiGatewayEvent({
         method: 'GET',
-        path: '/steal-day',
+        path: '/event-type',
         authorizerContext: { username: 'alejandro' },
       });
 
       const response = (await handler(event)) as APIGatewayProxyStructuredResultV2;
 
       expect(response.statusCode).toBe(200);
-      expect(parseHttpResponseBody(response.body)).toEqual(stealDay);
-      expect(getStealDay).toHaveBeenCalledWith('alejandro');
+      expect(parseHttpResponseBody(response.body)).toEqual(eventTypeResponse);
+      expect(getEventType).toHaveBeenCalledWith('alejandro');
     });
   });
 
-  it('returns 200 with full steal context on a steal day', async () => {
+  it('returns 200 with currentUserIsSteal true on a steal day', async () => {
     await withTestEnv(TEST_ENV, async () => {
       vi.resetModules();
-      const { getStealDay } = await import('./getStealDay');
+      const { getEventType } = await import('./getEventType');
       const { handler } = await import('./handler');
 
-      const stealDay: StealDayResponse = {
+      const eventTypeResponse: EventTypeResponse = {
         eventType: 'steal',
-        stealers: [{ stealerUsername: 'alejandro', matchId: 'match-1' }],
-        blockedUsernames: ['blocked-user'],
         currentUserIsSteal: true,
+        blockedUsernames: ['blocked-user'],
       };
-      vi.mocked(getStealDay).mockResolvedValue(stealDay);
+      vi.mocked(getEventType).mockResolvedValue(eventTypeResponse);
 
       const event = mockApiGatewayEvent({
         method: 'GET',
-        path: '/steal-day',
+        path: '/event-type',
         authorizerContext: { username: 'alejandro' },
       });
 
       const response = (await handler(event)) as APIGatewayProxyStructuredResultV2;
 
       expect(response.statusCode).toBe(200);
-      expect(parseHttpResponseBody(response.body)).toEqual(stealDay);
+      expect(parseHttpResponseBody(response.body)).toEqual(eventTypeResponse);
     });
   });
 
@@ -82,7 +80,7 @@ describe('get-steal-day handler', () => {
 
       const event = mockApiGatewayEvent({
         method: 'GET',
-        path: '/steal-day',
+        path: '/event-type',
       });
 
       const response = (await handler(event)) as APIGatewayProxyStructuredResultV2;

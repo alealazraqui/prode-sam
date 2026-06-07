@@ -147,9 +147,9 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Get steal day",
+      "name": "Get event type",
       "program": "${workspaceFolder}/scripts/debug-invoke.ts",
-      "args": ["get-steal-day", "${input:get_steal_day_invocation}"],
+      "args": ["get-event-type", "${input:get_event_type_invocation}"],
       "cwd": "${workspaceFolder}",
       "console": "integratedTerminal",
       "runtimeArgs": ["-r", "tsx/cjs/register"],
@@ -243,14 +243,14 @@
       "default": "get-predictions-success"
     },
     {
-      "id": "get_steal_day_invocation",
+      "id": "get_event_type_invocation",
       "type": "pickString",
-      "description": "Get steal day: invocacion a ejecutar",
+      "description": "Get event type: invocacion a ejecutar",
       "options": [
-        { "label": "Dia de robo autenticado", "value": "get-steal-day-success" },
-        { "label": "Sin contexto de authorizer", "value": "get-steal-day-unauthorized" }
+        { "label": "Dia de robo autenticado", "value": "get-event-type-success" },
+        { "label": "Sin contexto de authorizer", "value": "get-event-type-unauthorized" }
       ],
-      "default": "get-steal-day-success"
+      "default": "get-event-type-success"
     },
     {
       "id": "upload_matches_invocation",

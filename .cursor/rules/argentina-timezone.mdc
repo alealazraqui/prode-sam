@@ -22,7 +22,7 @@ export function getArgentinaTodayDateString(now: Date = new Date()): string {
 }
 ```
 
-Referencia implementada: `src/functions/get-steal-day/getArgentinaTodayDateString.ts`.
+Referencia implementada: `src/functions/get-event-type/getArgentinaTodayDateString.ts`.
 
 ## Donde ubicar el helper
 
