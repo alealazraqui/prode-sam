@@ -12,10 +12,7 @@ function buildAliasByUsername(users: UserItem[]): Map<string, string> {
   return new Map(users.map((user) => [user.username, user.alias ?? user.username]));
 }
 
-function mapItemsToResponses(
-  items: PredictionItem[],
-  aliasByUsername: Map<string, string>,
-) {
+function mapItemsToResponses(items: PredictionItem[], aliasByUsername: Map<string, string>) {
   return items.map((item) =>
     mapPredictionToResponse(item, aliasByUsername.get(item.username) ?? item.username),
   );

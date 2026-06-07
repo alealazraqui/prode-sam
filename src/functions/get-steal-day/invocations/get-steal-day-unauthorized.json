@@ -1,0 +1,28 @@
+{
+  "version": "2.0",
+  "routeKey": "GET /steal-day",
+  "rawPath": "/steal-day",
+  "rawQueryString": "",
+  "headers": {
+    "authorization": "Bearer placeholder-token"
+  },
+  "requestContext": {
+    "accountId": "123456789012",
+    "apiId": "local",
+    "domainName": "localhost",
+    "domainPrefix": "localhost",
+    "http": {
+      "method": "GET",
+      "path": "/steal-day",
+      "protocol": "HTTP/1.1",
+      "sourceIp": "127.0.0.1",
+      "userAgent": "manual-invoke"
+    },
+    "requestId": "local-get-steal-day-unauthorized",
+    "routeKey": "GET /steal-day",
+    "stage": "$default",
+    "time": "01/Jan/2024:00:00:00 +0000",
+    "timeEpoch": 1704067200000
+  },
+  "isBase64Encoded": false
+}

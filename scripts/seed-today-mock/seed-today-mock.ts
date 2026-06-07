@@ -11,6 +11,7 @@ import { createInterface } from 'node:readline';
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import { DynamoDBDocumentClient, PutCommand } from '@aws-sdk/lib-dynamodb';
 import type { MatchItem } from '../seed-matches/types';
+import { loadEnvLocal } from '../load-env-local';
 
 const MATCHES_FILE = resolve(__dirname, 'mock-today-matches.csv');
 const USERS_FILE = resolve(__dirname, '../seed-users/users.json');
@@ -26,6 +27,7 @@ type SeedPredictionItem = {
 };
 
 async function main(): Promise<void> {
+  loadEnvLocal();
   const matchesTable = resolveTableName('MATCHES_TABLE_NAME', 'Matches');
   const predictionsTable = resolveTableName('PREDICTIONS_TABLE_NAME', 'Predictions');
   const users = loadUsers();
@@ -48,9 +50,7 @@ async function main(): Promise<void> {
     console.log(`Seeded ${users.length} random predictions for ${match.matchId}`);
   }
 
-  console.log(
-    `Done. ${matches.length} match(es) and ${predictionCount} prediction(s) written.`,
-  );
+  console.log(`Done. ${matches.length} match(es) and ${predictionCount} prediction(s) written.`);
 }
 
 async function loadMatchesFromCsv(filePath: string): Promise<MatchItem[]> {

@@ -1,5 +1,5 @@
 matchId,homeTeamName,homeTeamCode,awayTeamName,awayTeamCode,homeGoals,awayGoals,kickoffAt,status,isFirstRound
-mock-today-001,Chile,CHI,Paraguay,PAR,,,2026-06-06T08:00:00.000Z,1,true
-mock-today-002,México,MEX,Canadá,CAN,,,2026-06-06T10:00:00.000Z,1,true
-mock-today-003,Japón,JPN,Corea del Sur,KOR,,,2026-06-06T12:00:00.000Z,1,true
-mock-today-004,Argentina,ARG,Bolivia,BOL,,,2026-06-06T21:15:00.000Z,1,true
+mock-today-001,Chile,CL,Paraguay,PY,2,1,2026-06-07T08:00:00.000Z,2,true
+mock-today-002,México,MX,Canadá,CA,1,1,2026-06-07T10:00:00.000Z,2,true
+mock-today-003,Japón,JP,Corea del Sur,KR,,,2026-06-07T21:00:00.000Z,1,true
+mock-today-004,Argentina,AR,Bolivia,BO,,,2026-06-07T23:15:00.000Z,1,true

@@ -1,0 +1,42 @@
+---
+description: Fecha calendario del dia corriente en zona horaria Argentina para Lambdas de prode-sam
+alwaysApply: false
+---
+
+# Fecha del dia corriente (Argentina)
+
+## Cuando aplicar
+
+- Una Lambda necesita el **dia calendario actual del negocio** (YYYY-MM-DD), no UTC ni la zona del runtime.
+- Ejemplos: lectura de `DayEvents`, filtros por `dayId` en tablas de robo, reglas que dependen del "dia de hoy" en Argentina.
+
+## Patron
+
+Usar `America/Argentina/Buenos_Aires` y formato `YYYY-MM-DD` via locale `en-CA`:
+
+```typescript
+const ARGENTINA_TIME_ZONE = 'America/Argentina/Buenos_Aires';
+
+export function getArgentinaTodayDateString(now: Date = new Date()): string {
+  return now.toLocaleDateString('en-CA', { timeZone: ARGENTINA_TIME_ZONE });
+}
+```
+
+Referencia implementada: `src/functions/get-steal-day/getArgentinaTodayDateString.ts`.
+
+## Donde ubicar el helper
+
+| Uso | Ubicacion |
+|-----|-----------|
+| Solo una Lambda | `src/functions/<caso>/` junto al paso que lo necesita |
+| Dos o mas Lambdas | mover a `src/shared/` (ej. `shared/date/getArgentinaTodayDateString.ts`) |
+
+## Tests
+
+- Funcion pura: testear con `vi.useFakeTimers()` + `vi.setSystemTime()` fijando un instante UTC conocido y assert del `YYYY-MM-DD` esperado en Argentina.
+- No mockear `toLocaleDateString`; el contrato es la fecha calendaria resultante.
+
+## Que no hacer
+
+- No usar `new Date().toISOString().slice(0, 10)` (UTC, puede desfasar el dia respecto a Argentina cerca de medianoche).
+- No hardcodear offsets manuales (+3 / -3); usar `timeZone` del runtime.

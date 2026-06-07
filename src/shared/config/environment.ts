@@ -13,5 +13,7 @@ export const environment = {
   matchesTableName: getRequiredEnv('MATCHES_TABLE_NAME'),
   predictionsTableName: getRequiredEnv('PREDICTIONS_TABLE_NAME'),
   dayEventsTableName: getRequiredEnv('DAY_EVENTS_TABLE_NAME'),
+  stealersTableName: getRequiredEnv('STEALERS_TABLE_NAME'),
+  blockedVictimsTableName: getRequiredEnv('BLOCKED_VICTIMS_TABLE_NAME'),
   jwtSecret: getRequiredEnv('JWT_SECRET'),
 };

@@ -25,6 +25,7 @@ describe('get-predictions handler', () => {
         myPredictions: [
           {
             username: 'user1',
+            alias: 'User One',
             matchId: 'wc26-m001',
             homeGoals: 2,
             awayGoals: 1,
@@ -35,6 +36,7 @@ describe('get-predictions handler', () => {
         allPredictions: [
           {
             username: 'user1',
+            alias: 'User One',
             matchId: 'wc26-m001',
             homeGoals: 2,
             awayGoals: 1,
@@ -58,6 +60,7 @@ describe('get-predictions handler', () => {
         myPredictions: [
           {
             username: 'user1',
+            alias: 'User One',
             matchId: 'wc26-m001',
             homeGoals: 2,
             awayGoals: 1,
@@ -68,6 +71,7 @@ describe('get-predictions handler', () => {
         allPredictions: [
           {
             username: 'user1',
+            alias: 'User One',
             matchId: 'wc26-m001',
             homeGoals: 2,
             awayGoals: 1,

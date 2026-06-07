@@ -57,6 +57,10 @@ expect(response.statusCode).toBe(200);
 
 ### Pasos con env vars o módulos con side effects al importar
 
+`withTestEnv` fusiona los valores pasados con `TEST_ENV_DEFAULTS` en `src/shared/test/withTestEnv.ts`.
+
+**Al agregar env vars en `environment.ts`:** actualizar también `TEST_ENV_DEFAULTS` con el mismo nombre y un valor dummy de test (ej. nombre de tabla). Si no, `getRequiredEnv` falla al importar módulos en la suite y se rompen tests masivamente aunque el test no use esa tabla.
+
 ```typescript
 await withTestEnv({ JWT_SECRET: '...', USERS_TABLE_NAME: 'Users' }, async () => {
   vi.resetModules();

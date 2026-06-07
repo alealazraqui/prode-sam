@@ -11,6 +11,7 @@
     "seed:predictions": "tsx scripts/seed-predictions/seed-predictions.ts",
     "seed:day-events": "tsx scripts/seed-day-events/seed-day-events.ts",
     "seed:today-mock": "tsx scripts/seed-today-mock/seed-today-mock.ts",
+    "seed:steal-test": "tsx scripts/seed-steal-day-test/seed-steal-day-test.ts",
     "test": "vitest run",
     "test:watch": "vitest",
     "format": "prettier --write \"src/**/*.ts\" \"scripts/**/*.ts\"",

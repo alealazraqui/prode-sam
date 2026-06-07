@@ -147,6 +147,27 @@
     {
       "type": "node",
       "request": "launch",
+      "name": "Get steal day",
+      "program": "${workspaceFolder}/scripts/debug-invoke.ts",
+      "args": ["get-steal-day", "${input:get_steal_day_invocation}"],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "runtimeArgs": ["-r", "tsx/cjs/register"],
+      "envFile": "${workspaceFolder}/.env.local",
+      "env": {
+        "USERS_TABLE_NAME": "Users",
+        "MATCHES_TABLE_NAME": "Matches",
+        "PREDICTIONS_TABLE_NAME": "Predictions",
+        "DAY_EVENTS_TABLE_NAME": "DayEvents",
+        "STEALERS_TABLE_NAME": "Stealers",
+        "BLOCKED_VICTIMS_TABLE_NAME": "BlockedVictims",
+        "AWS_PROFILE": "prode-dev"
+      },
+      "skipFiles": ["<node_internals>/**"]
+    },
+    {
+      "type": "node",
+      "request": "launch",
       "name": "Upload matches",
       "program": "${workspaceFolder}/scripts/debug-invoke.ts",
       "args": ["upload-matches", "${input:upload_matches_invocation}"],
@@ -220,6 +241,16 @@
         { "label": "Listado de predicciones", "value": "get-predictions-success" }
       ],
       "default": "get-predictions-success"
+    },
+    {
+      "id": "get_steal_day_invocation",
+      "type": "pickString",
+      "description": "Get steal day: invocacion a ejecutar",
+      "options": [
+        { "label": "Dia de robo autenticado", "value": "get-steal-day-success" },
+        { "label": "Sin contexto de authorizer", "value": "get-steal-day-unauthorized" }
+      ],
+      "default": "get-steal-day-success"
     },
     {
       "id": "upload_matches_invocation",
