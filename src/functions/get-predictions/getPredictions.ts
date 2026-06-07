@@ -4,7 +4,9 @@ import type { PredictionItem } from '@/shared/types/predictionItem';
 import type { UserItem } from '@/shared/types/userItem';
 
 import { fetchMyPredictions } from './fetchMyPredictions';
+import { fetchMyStealPick } from './fetchMyStealPick';
 import { fetchOthersPredictions } from './fetchOthersPredictions';
+import { fetchPastStealPicks } from './fetchPastStealPicks';
 import { mapPredictionToResponse } from './mapPredictionToResponse';
 import type { GetPredictionsResponse } from './types';
 
@@ -19,10 +21,12 @@ function mapItemsToResponses(items: PredictionItem[], aliasByUsername: Map<strin
 }
 
 export async function getPredictions(authUsername: string): Promise<GetPredictionsResponse> {
-  const [myItems, othersItems, users] = await Promise.all([
+  const [myItems, othersItems, users, myStealPick, allStealPicks] = await Promise.all([
     fetchMyPredictions(authUsername),
     fetchOthersPredictions(authUsername),
     scanTable<UserItem>(environment.usersTableName),
+    fetchMyStealPick(authUsername),
+    fetchPastStealPicks(),
   ]);
 
   const aliasByUsername = buildAliasByUsername(users);
@@ -32,5 +36,7 @@ export async function getPredictions(authUsername: string): Promise<GetPredictio
   return {
     myPredictions,
     allPredictions: [...myPredictions, ...othersPredictions],
+    myStealPick,
+    allStealPicks,
   };
 }

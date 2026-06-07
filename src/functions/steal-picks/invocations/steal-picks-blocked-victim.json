@@ -1,0 +1,35 @@
+{
+  "version": "2.0",
+  "routeKey": "POST /steal-picks",
+  "rawPath": "/steal-picks",
+  "rawQueryString": "",
+  "headers": {
+    "content-type": "application/json",
+    "authorization": "Bearer placeholder-token"
+  },
+  "requestContext": {
+    "accountId": "123456789012",
+    "apiId": "local",
+    "domainName": "localhost",
+    "domainPrefix": "localhost",
+    "http": {
+      "method": "POST",
+      "path": "/steal-picks",
+      "protocol": "HTTP/1.1",
+      "sourceIp": "127.0.0.1",
+      "userAgent": "manual-invoke"
+    },
+    "requestId": "local-steal-picks-blocked-victim",
+    "routeKey": "POST /steal-picks",
+    "stage": "$default",
+    "time": "01/Jan/2024:00:00:00 +0000",
+    "timeEpoch": 1704067200000,
+    "authorizer": {
+      "lambda": {
+        "username": "alejandro.alazraqui"
+      }
+    }
+  },
+  "body": "{\"calendarDate\":\"2026-06-07\",\"victimUsername\":\"blocked.user\",\"matchId\":\"wc26-m003\"}",
+  "isBase64Encoded": false
+}

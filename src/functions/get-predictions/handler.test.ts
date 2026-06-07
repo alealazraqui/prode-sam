@@ -44,6 +44,14 @@ describe('get-predictions handler', () => {
             pointsCommon: null,
           },
         ],
+        myStealPick: {
+          calendarDate: '2026-06-07',
+          stealerUsername: 'user1',
+          victimUsername: 'other-user',
+          matchId: 'wc26-m003',
+          stolenPoints: 0,
+        },
+        allStealPicks: [],
       });
 
       const { handler } = await import('./handler');
@@ -79,6 +87,14 @@ describe('get-predictions handler', () => {
             pointsCommon: null,
           },
         ],
+        myStealPick: {
+          calendarDate: '2026-06-07',
+          stealerUsername: 'user1',
+          victimUsername: 'other-user',
+          matchId: 'wc26-m003',
+          stolenPoints: 0,
+        },
+        allStealPicks: [],
       });
       expect(getPredictions).toHaveBeenCalledWith('user1');
     });

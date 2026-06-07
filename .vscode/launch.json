@@ -168,6 +168,28 @@
     {
       "type": "node",
       "request": "launch",
+      "name": "Steal picks",
+      "program": "${workspaceFolder}/scripts/debug-invoke.ts",
+      "args": ["steal-picks", "${input:steal_picks_invocation}"],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "runtimeArgs": ["-r", "tsx/cjs/register"],
+      "envFile": "${workspaceFolder}/.env.local",
+      "env": {
+        "USERS_TABLE_NAME": "Users",
+        "MATCHES_TABLE_NAME": "Matches",
+        "PREDICTIONS_TABLE_NAME": "Predictions",
+        "DAY_EVENTS_TABLE_NAME": "DayEvents",
+        "STEALERS_TABLE_NAME": "Stealers",
+        "BLOCKED_VICTIMS_TABLE_NAME": "BlockedVictims",
+        "STEAL_PICKS_TABLE_NAME": "StealPicks",
+        "AWS_PROFILE": "prode-dev"
+      },
+      "skipFiles": ["<node_internals>/**"]
+    },
+    {
+      "type": "node",
+      "request": "launch",
       "name": "Upload matches",
       "program": "${workspaceFolder}/scripts/debug-invoke.ts",
       "args": ["upload-matches", "${input:upload_matches_invocation}"],
@@ -251,6 +273,16 @@
         { "label": "Sin contexto de authorizer", "value": "get-event-type-unauthorized" }
       ],
       "default": "get-event-type-success"
+    },
+    {
+      "id": "steal_picks_invocation",
+      "type": "pickString",
+      "description": "Steal picks: invocacion a ejecutar",
+      "options": [
+        { "label": "Confirmar robo valido", "value": "steal-picks-success" },
+        { "label": "Victima bloqueada", "value": "steal-picks-blocked-victim" }
+      ],
+      "default": "steal-picks-success"
     },
     {
       "id": "upload_matches_invocation",

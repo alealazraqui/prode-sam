@@ -18,6 +18,14 @@ vi.mock('./fetchOthersPredictions', () => ({
   fetchOthersPredictions: vi.fn(),
 }));
 
+vi.mock('./fetchMyStealPick', () => ({
+  fetchMyStealPick: vi.fn(),
+}));
+
+vi.mock('./fetchPastStealPicks', () => ({
+  fetchPastStealPicks: vi.fn(),
+}));
+
 vi.mock('@/shared/dynamo/scanTable', () => ({
   scanTable: vi.fn(),
 }));
@@ -70,14 +78,20 @@ describe('getPredictions', () => {
       vi.resetModules();
       const { fetchMyPredictions } = await import('./fetchMyPredictions');
       const { fetchOthersPredictions } = await import('./fetchOthersPredictions');
+      const { fetchMyStealPick } = await import('./fetchMyStealPick');
+      const { fetchPastStealPicks } = await import('./fetchPastStealPicks');
       const { scanTable } = await import('@/shared/dynamo/scanTable');
       vi.mocked(fetchMyPredictions).mockResolvedValue([ownFutureKickoff, ownPastKickoff]);
       vi.mocked(fetchOthersPredictions).mockResolvedValue([]);
+      vi.mocked(fetchMyStealPick).mockResolvedValue(null);
+      vi.mocked(fetchPastStealPicks).mockResolvedValue([]);
       vi.mocked(scanTable).mockResolvedValue(mockUsers);
 
       const { getPredictions } = await import('./getPredictions');
       const result = await getPredictions('user1');
 
+      expect(result.myStealPick).toBeNull();
+      expect(result.allStealPicks).toEqual([]);
       expect(result.myPredictions).toEqual([
         {
           username: 'user1',
@@ -106,9 +120,13 @@ describe('getPredictions', () => {
       vi.resetModules();
       const { fetchMyPredictions } = await import('./fetchMyPredictions');
       const { fetchOthersPredictions } = await import('./fetchOthersPredictions');
+      const { fetchMyStealPick } = await import('./fetchMyStealPick');
+      const { fetchPastStealPicks } = await import('./fetchPastStealPicks');
       const { scanTable } = await import('@/shared/dynamo/scanTable');
       vi.mocked(fetchMyPredictions).mockResolvedValue([ownPastKickoff]);
       vi.mocked(fetchOthersPredictions).mockResolvedValue([]);
+      vi.mocked(fetchMyStealPick).mockResolvedValue(null);
+      vi.mocked(fetchPastStealPicks).mockResolvedValue([]);
       vi.mocked(scanTable).mockResolvedValue(mockUsers);
 
       const { getPredictions } = await import('./getPredictions');
@@ -133,9 +151,13 @@ describe('getPredictions', () => {
       vi.resetModules();
       const { fetchMyPredictions } = await import('./fetchMyPredictions');
       const { fetchOthersPredictions } = await import('./fetchOthersPredictions');
+      const { fetchMyStealPick } = await import('./fetchMyStealPick');
+      const { fetchPastStealPicks } = await import('./fetchPastStealPicks');
       const { scanTable } = await import('@/shared/dynamo/scanTable');
       vi.mocked(fetchMyPredictions).mockResolvedValue([ownPastKickoff]);
       vi.mocked(fetchOthersPredictions).mockResolvedValue([otherPastKickoff]);
+      vi.mocked(fetchMyStealPick).mockResolvedValue(null);
+      vi.mocked(fetchPastStealPicks).mockResolvedValue([]);
       vi.mocked(scanTable).mockResolvedValue(mockUsers);
 
       const { getPredictions } = await import('./getPredictions');
@@ -169,9 +191,13 @@ describe('getPredictions', () => {
       vi.resetModules();
       const { fetchMyPredictions } = await import('./fetchMyPredictions');
       const { fetchOthersPredictions } = await import('./fetchOthersPredictions');
+      const { fetchMyStealPick } = await import('./fetchMyStealPick');
+      const { fetchPastStealPicks } = await import('./fetchPastStealPicks');
       const { scanTable } = await import('@/shared/dynamo/scanTable');
       vi.mocked(fetchMyPredictions).mockResolvedValue([]);
       vi.mocked(fetchOthersPredictions).mockResolvedValue([ownPastKickoff, otherWithoutPoints]);
+      vi.mocked(fetchMyStealPick).mockResolvedValue(null);
+      vi.mocked(fetchPastStealPicks).mockResolvedValue([]);
       vi.mocked(scanTable).mockResolvedValue(mockUsers);
 
       const { getPredictions } = await import('./getPredictions');
@@ -197,6 +223,46 @@ describe('getPredictions', () => {
           pointsCommon: null,
         },
       ]);
+    });
+  });
+
+  it('returns myStealPick and allStealPicks alongside predictions', async () => {
+    await withTestEnv(TEST_ENV, async () => {
+      vi.resetModules();
+      const { fetchMyPredictions } = await import('./fetchMyPredictions');
+      const { fetchOthersPredictions } = await import('./fetchOthersPredictions');
+      const { fetchMyStealPick } = await import('./fetchMyStealPick');
+      const { fetchPastStealPicks } = await import('./fetchPastStealPicks');
+      const { scanTable } = await import('@/shared/dynamo/scanTable');
+
+      const myStealPick = {
+        calendarDate: '2026-06-07',
+        stealerUsername: 'user1',
+        victimUsername: 'other-user',
+        matchId: 'wc26-m003',
+        stolenPoints: 0,
+      };
+      const allStealPicks = [
+        {
+          calendarDate: '2026-06-05',
+          stealerUsername: 'other-user',
+          victimUsername: 'user1',
+          matchId: 'wc26-m001',
+          stolenPoints: 0,
+        },
+      ];
+
+      vi.mocked(fetchMyPredictions).mockResolvedValue([]);
+      vi.mocked(fetchOthersPredictions).mockResolvedValue([]);
+      vi.mocked(fetchMyStealPick).mockResolvedValue(myStealPick);
+      vi.mocked(fetchPastStealPicks).mockResolvedValue(allStealPicks);
+      vi.mocked(scanTable).mockResolvedValue(mockUsers);
+
+      const { getPredictions } = await import('./getPredictions');
+      const result = await getPredictions('user1');
+
+      expect(result.myStealPick).toEqual(myStealPick);
+      expect(result.allStealPicks).toEqual(allStealPicks);
     });
   });
 });

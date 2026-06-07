@@ -22,6 +22,7 @@ Globals:
         DAY_EVENTS_TABLE_NAME: !Ref DayEventsTable
         STEALERS_TABLE_NAME: !Ref StealersTable
         BLOCKED_VICTIMS_TABLE_NAME: !Ref BlockedVictimsTable
+        STEAL_PICKS_TABLE_NAME: !Ref StealPicksTable
         JWT_SECRET: !Ref JwtSecret
 
 Resources:
@@ -121,12 +122,12 @@ Resources:
       TableName: Stealers
       BillingMode: PAY_PER_REQUEST
       AttributeDefinitions:
-        - AttributeName: dayId
+        - AttributeName: calendarDate
           AttributeType: S
         - AttributeName: stealerUsername
           AttributeType: S
       KeySchema:
-        - AttributeName: dayId
+        - AttributeName: calendarDate
           KeyType: HASH
         - AttributeName: stealerUsername
           KeyType: RANGE
@@ -144,6 +145,33 @@ Resources:
       KeySchema:
         - AttributeName: username
           KeyType: HASH
+
+  StealPicksTable:
+    Type: AWS::DynamoDB::Table
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Delete
+    Properties:
+      TableName: StealPicks
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: calendarDate
+          AttributeType: S
+        - AttributeName: stealerUsername
+          AttributeType: S
+        - AttributeName: matchId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: calendarDate
+          KeyType: HASH
+        - AttributeName: stealerUsername
+          KeyType: RANGE
+      GlobalSecondaryIndexes:
+        - IndexName: matchId-index
+          KeySchema:
+            - AttributeName: matchId
+              KeyType: HASH
+          Projection:
+            ProjectionType: ALL
 
   JwtAuthorizerFunction:
     Type: AWS::Serverless::Function
@@ -301,6 +329,10 @@ Resources:
             TableName: !Ref PredictionsTable
         - DynamoDBReadPolicy:
             TableName: !Ref UsersTable
+        - DynamoDBReadPolicy:
+            TableName: !Ref StealPicksTable
+        - DynamoDBReadPolicy:
+            TableName: !Ref MatchesTable
       Events:
         GetPredictionsApi:
           Type: HttpApi
@@ -400,6 +432,42 @@ Resources:
         Target: es2020
         Sourcemap: true
 
+  SaveStealPickFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: .
+      Handler: src/functions/steal-picks/handler.handler
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref StealersTable
+        - DynamoDBReadPolicy:
+            TableName: !Ref BlockedVictimsTable
+        - DynamoDBReadPolicy:
+            TableName: !Ref DayEventsTable
+        - DynamoDBReadPolicy:
+            TableName: !Ref MatchesTable
+        - DynamoDBReadPolicy:
+            TableName: !Ref StealPicksTable
+        - DynamoDBWritePolicy:
+            TableName: !Ref BlockedVictimsTable
+        - DynamoDBWritePolicy:
+            TableName: !Ref StealPicksTable
+      Events:
+        SaveStealPickApi:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref ProdeHttpApi
+            Path: /steal-picks
+            Method: POST
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        EntryPoints:
+          - src/functions/steal-picks/handler.ts
+        Minify: true
+        Target: es2020
+        Sourcemap: true
+
 Outputs:
   UsersTableName:
     Description: DynamoDB Users table name (for seed scripts and Lambdas)
@@ -431,6 +499,11 @@ Outputs:
     Value: !Ref BlockedVictimsTable
     Export:
       Name: !Sub '${AWS::StackName}-BlockedVictimsTableName'
+  StealPicksTableName:
+    Description: DynamoDB StealPicks table name (for seed scripts and Lambdas)
+    Value: !Ref StealPicksTable
+    Export:
+      Name: !Sub '${AWS::StackName}-StealPicksTableName'
   HttpApiUrl:
     Description: HTTP API base URL
     Value: !Sub 'https://${ProdeHttpApi}.execute-api.${AWS::Region}.amazonaws.com'

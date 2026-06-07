@@ -1,3 +1,5 @@
+import type { StealPickItem } from '@/shared/types/stealPickItem';
+
 export type PredictionResponse = {
   username: string;
   alias: string;
@@ -11,4 +13,6 @@ export type PredictionResponse = {
 export type GetPredictionsResponse = {
   myPredictions: PredictionResponse[];
   allPredictions: PredictionResponse[];
+  myStealPick: StealPickItem | null;
+  allStealPicks: StealPickItem[];
 };

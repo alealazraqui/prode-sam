@@ -8,7 +8,7 @@ alwaysApply: false
 ## Cuando aplicar
 
 - Una Lambda necesita el **dia calendario actual del negocio** (YYYY-MM-DD), no UTC ni la zona del runtime.
-- Ejemplos: lectura de `DayEvents`, filtros por `dayId` en tablas de robo, reglas que dependen del "dia de hoy" en Argentina.
+- Ejemplos: lectura de `DayEvents`, filtros por `calendarDate` en tablas de robo, reglas que dependen del "dia de hoy" en Argentina.
 
 ## Patron
 
