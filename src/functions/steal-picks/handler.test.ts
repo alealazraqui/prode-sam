@@ -19,6 +19,10 @@ vi.mock('./processStealPick', () => ({
   processStealPick: vi.fn(),
 }));
 
+vi.mock('./deleteStealPick', () => ({
+  deleteStealPick: vi.fn(),
+}));
+
 describe('steal-picks handler', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -113,6 +117,27 @@ describe('steal-picks handler', () => {
         code: 'BAD_REQUEST',
         message: 'Kickoff has passed for match wc26-m010',
       });
+    });
+  });
+
+  it('returns 200 for DELETE and calls deleteStealPick for the authenticated user', async () => {
+    await withTestEnv(TEST_ENV, async () => {
+      vi.resetModules();
+      const { deleteStealPick } = await import('./deleteStealPick');
+      vi.mocked(deleteStealPick).mockResolvedValue(undefined);
+      const { handler } = await import('./handler');
+
+      const event = mockApiGatewayEvent({
+        method: 'DELETE',
+        path: '/steal-picks',
+        authorizerContext: { username: 'stealer.user' },
+      });
+
+      const response = (await handler(event)) as APIGatewayProxyStructuredResultV2;
+
+      expect(response.statusCode).toBe(200);
+      expect(parseHttpResponseBody(response.body)).toEqual({ ok: true });
+      expect(deleteStealPick).toHaveBeenCalledWith('stealer.user');
     });
   });
 

@@ -3,12 +3,20 @@ import { extractAuthenticatedUsername } from '@/shared/auth/extractAuthenticated
 import { handleError } from '@/shared/errors/handleError';
 import { createHttpResponse } from '@/shared/http/createHttpResponse';
 import { parseJsonBody } from '@/shared/http/parseJsonBody';
+import { deleteStealPick } from './deleteStealPick';
 import { parseStealPickBody } from './parseStealPickBody';
 import { processStealPick } from './processStealPick';
 
 export const handler = async (event: APIGatewayProxyEventV2): Promise<APIGatewayProxyResultV2> => {
   try {
     const stealerUsername = extractAuthenticatedUsername(event);
+    const method = event.requestContext.http.method;
+
+    if (method === 'DELETE') {
+      await deleteStealPick(stealerUsername);
+      return createHttpResponse(200, { ok: true });
+    }
+
     const body = parseJsonBody<unknown>(event.body ?? null);
     const request = parseStealPickBody(body);
     await processStealPick(stealerUsername, request);

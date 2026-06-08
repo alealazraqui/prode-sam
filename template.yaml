@@ -440,17 +440,13 @@ Resources:
       Policies:
         - DynamoDBReadPolicy:
             TableName: !Ref StealersTable
-        - DynamoDBReadPolicy:
+        - DynamoDBCrudPolicy:
             TableName: !Ref BlockedVictimsTable
         - DynamoDBReadPolicy:
             TableName: !Ref DayEventsTable
         - DynamoDBReadPolicy:
             TableName: !Ref MatchesTable
-        - DynamoDBReadPolicy:
-            TableName: !Ref StealPicksTable
-        - DynamoDBWritePolicy:
-            TableName: !Ref BlockedVictimsTable
-        - DynamoDBWritePolicy:
+        - DynamoDBCrudPolicy:
             TableName: !Ref StealPicksTable
       Events:
         SaveStealPickApi:
@@ -459,6 +455,12 @@ Resources:
             ApiId: !Ref ProdeHttpApi
             Path: /steal-picks
             Method: POST
+        DeleteStealPickApi:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref ProdeHttpApi
+            Path: /steal-picks
+            Method: DELETE
     Metadata:
       BuildMethod: esbuild
       BuildProperties:
