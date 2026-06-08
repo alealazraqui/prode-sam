@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import { withTestEnv } from '@/shared/test/withTestEnv';
+import type { PredictionItem } from '@/shared/types/predictionItem';
 import type { StealPickItem } from '@/shared/types/stealPickItem';
 
 vi.mock('@/shared/dynamo/scanTable', () => ({

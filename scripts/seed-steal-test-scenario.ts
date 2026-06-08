@@ -20,9 +20,7 @@ import {
   ScanCommand,
 } from '@aws-sdk/lib-dynamodb';
 
-const client = DynamoDBDocumentClient.from(
-  new DynamoDBClient({ region: 'us-east-1' }),
-);
+const client = DynamoDBDocumentClient.from(new DynamoDBClient({ region: 'us-east-1' }));
 
 const MATCHES_TABLE = process.env.MATCHES_TABLE_NAME ?? 'Matches';
 const PREDICTIONS_TABLE = process.env.PREDICTIONS_TABLE_NAME ?? 'Predictions';
@@ -97,48 +95,53 @@ const STEAL_SCENARIO = [
 
 // Predicciones de los 11 jugadores para los 3 partidos (33 en total)
 // Las predicciones de las víctimas son las que determinarán el stolenPoints
-const PREDICTIONS: Array<{ username: string; matchId: string; homeGoals: number; awayGoals: number }> = [
+const PREDICTIONS: Array<{
+  username: string;
+  matchId: string;
+  homeGoals: number;
+  awayGoals: number;
+}> = [
   // --- mock-today-1: Argentina vs Brasil ---
   // marco.munoz es víctima de alejandro → predicción clave para stolenPoints
-  { username: 'alejandro.alazraqui',  matchId: 'mock-today-1', homeGoals: 2, awayGoals: 0 },
-  { username: 'bruno.munoz',          matchId: 'mock-today-1', homeGoals: 1, awayGoals: 0 },
-  { username: 'marco.munoz',          matchId: 'mock-today-1', homeGoals: 1, awayGoals: 0 },
-  { username: 'simbad.peralta',       matchId: 'mock-today-1', homeGoals: 2, awayGoals: 1 },
-  { username: 'sebastian.pasarin',    matchId: 'mock-today-1', homeGoals: 0, awayGoals: 0 },
-  { username: 'nicolas.sanchez',      matchId: 'mock-today-1', homeGoals: 3, awayGoals: 1 },
-  { username: 'franco.dicarlo',       matchId: 'mock-today-1', homeGoals: 2, awayGoals: 0 },
-  { username: 'thomas.colagiovanni',  matchId: 'mock-today-1', homeGoals: 1, awayGoals: 1 },
-  { username: 'julian.borgo',         matchId: 'mock-today-1', homeGoals: 0, awayGoals: 1 },
-  { username: 'agustin.martinez',     matchId: 'mock-today-1', homeGoals: 2, awayGoals: 0 },
-  { username: 'daniel.golluscio',     matchId: 'mock-today-1', homeGoals: 1, awayGoals: 2 },
+  { username: 'alejandro.alazraqui', matchId: 'mock-today-1', homeGoals: 2, awayGoals: 0 },
+  { username: 'bruno.munoz', matchId: 'mock-today-1', homeGoals: 1, awayGoals: 0 },
+  { username: 'marco.munoz', matchId: 'mock-today-1', homeGoals: 1, awayGoals: 0 },
+  { username: 'simbad.peralta', matchId: 'mock-today-1', homeGoals: 2, awayGoals: 1 },
+  { username: 'sebastian.pasarin', matchId: 'mock-today-1', homeGoals: 0, awayGoals: 0 },
+  { username: 'nicolas.sanchez', matchId: 'mock-today-1', homeGoals: 3, awayGoals: 1 },
+  { username: 'franco.dicarlo', matchId: 'mock-today-1', homeGoals: 2, awayGoals: 0 },
+  { username: 'thomas.colagiovanni', matchId: 'mock-today-1', homeGoals: 1, awayGoals: 1 },
+  { username: 'julian.borgo', matchId: 'mock-today-1', homeGoals: 0, awayGoals: 1 },
+  { username: 'agustin.martinez', matchId: 'mock-today-1', homeGoals: 2, awayGoals: 0 },
+  { username: 'daniel.golluscio', matchId: 'mock-today-1', homeGoals: 1, awayGoals: 2 },
 
   // --- mock-today-2: España vs Francia ---
   // nicolas.sanchez es víctima de bruno → predicción clave para stolenPoints
-  { username: 'alejandro.alazraqui',  matchId: 'mock-today-2', homeGoals: 1, awayGoals: 0 },
-  { username: 'bruno.munoz',          matchId: 'mock-today-2', homeGoals: 1, awayGoals: 1 },
-  { username: 'marco.munoz',          matchId: 'mock-today-2', homeGoals: 2, awayGoals: 0 },
-  { username: 'simbad.peralta',       matchId: 'mock-today-2', homeGoals: 0, awayGoals: 1 },
-  { username: 'sebastian.pasarin',    matchId: 'mock-today-2', homeGoals: 1, awayGoals: 0 },
-  { username: 'nicolas.sanchez',      matchId: 'mock-today-2', homeGoals: 2, awayGoals: 1 },
-  { username: 'franco.dicarlo',       matchId: 'mock-today-2', homeGoals: 1, awayGoals: 1 },
-  { username: 'thomas.colagiovanni',  matchId: 'mock-today-2', homeGoals: 0, awayGoals: 0 },
-  { username: 'julian.borgo',         matchId: 'mock-today-2', homeGoals: 1, awayGoals: 2 },
-  { username: 'agustin.martinez',     matchId: 'mock-today-2', homeGoals: 2, awayGoals: 0 },
-  { username: 'daniel.golluscio',     matchId: 'mock-today-2', homeGoals: 0, awayGoals: 1 },
+  { username: 'alejandro.alazraqui', matchId: 'mock-today-2', homeGoals: 1, awayGoals: 0 },
+  { username: 'bruno.munoz', matchId: 'mock-today-2', homeGoals: 1, awayGoals: 1 },
+  { username: 'marco.munoz', matchId: 'mock-today-2', homeGoals: 2, awayGoals: 0 },
+  { username: 'simbad.peralta', matchId: 'mock-today-2', homeGoals: 0, awayGoals: 1 },
+  { username: 'sebastian.pasarin', matchId: 'mock-today-2', homeGoals: 1, awayGoals: 0 },
+  { username: 'nicolas.sanchez', matchId: 'mock-today-2', homeGoals: 2, awayGoals: 1 },
+  { username: 'franco.dicarlo', matchId: 'mock-today-2', homeGoals: 1, awayGoals: 1 },
+  { username: 'thomas.colagiovanni', matchId: 'mock-today-2', homeGoals: 0, awayGoals: 0 },
+  { username: 'julian.borgo', matchId: 'mock-today-2', homeGoals: 1, awayGoals: 2 },
+  { username: 'agustin.martinez', matchId: 'mock-today-2', homeGoals: 2, awayGoals: 0 },
+  { username: 'daniel.golluscio', matchId: 'mock-today-2', homeGoals: 0, awayGoals: 1 },
 
   // --- mock-today-3: Alemania vs Italia ---
   // thomas.colagiovanni es víctima de simbad → predicción clave para stolenPoints
-  { username: 'alejandro.alazraqui',  matchId: 'mock-today-3', homeGoals: 1, awayGoals: 0 },
-  { username: 'bruno.munoz',          matchId: 'mock-today-3', homeGoals: 2, awayGoals: 1 },
-  { username: 'marco.munoz',          matchId: 'mock-today-3', homeGoals: 0, awayGoals: 0 },
-  { username: 'simbad.peralta',       matchId: 'mock-today-3', homeGoals: 0, awayGoals: 0 },
-  { username: 'sebastian.pasarin',    matchId: 'mock-today-3', homeGoals: 1, awayGoals: 1 },
-  { username: 'nicolas.sanchez',      matchId: 'mock-today-3', homeGoals: 2, awayGoals: 0 },
-  { username: 'franco.dicarlo',       matchId: 'mock-today-3', homeGoals: 1, awayGoals: 0 },
-  { username: 'thomas.colagiovanni',  matchId: 'mock-today-3', homeGoals: 1, awayGoals: 2 },
-  { username: 'julian.borgo',         matchId: 'mock-today-3', homeGoals: 0, awayGoals: 0 },
-  { username: 'agustin.martinez',     matchId: 'mock-today-3', homeGoals: 3, awayGoals: 0 },
-  { username: 'daniel.golluscio',     matchId: 'mock-today-3', homeGoals: 0, awayGoals: 1 },
+  { username: 'alejandro.alazraqui', matchId: 'mock-today-3', homeGoals: 1, awayGoals: 0 },
+  { username: 'bruno.munoz', matchId: 'mock-today-3', homeGoals: 2, awayGoals: 1 },
+  { username: 'marco.munoz', matchId: 'mock-today-3', homeGoals: 0, awayGoals: 0 },
+  { username: 'simbad.peralta', matchId: 'mock-today-3', homeGoals: 0, awayGoals: 0 },
+  { username: 'sebastian.pasarin', matchId: 'mock-today-3', homeGoals: 1, awayGoals: 1 },
+  { username: 'nicolas.sanchez', matchId: 'mock-today-3', homeGoals: 2, awayGoals: 0 },
+  { username: 'franco.dicarlo', matchId: 'mock-today-3', homeGoals: 1, awayGoals: 0 },
+  { username: 'thomas.colagiovanni', matchId: 'mock-today-3', homeGoals: 1, awayGoals: 2 },
+  { username: 'julian.borgo', matchId: 'mock-today-3', homeGoals: 0, awayGoals: 0 },
+  { username: 'agustin.martinez', matchId: 'mock-today-3', homeGoals: 3, awayGoals: 0 },
+  { username: 'daniel.golluscio', matchId: 'mock-today-3', homeGoals: 0, awayGoals: 1 },
 ];
 
 async function scanAll<T>(tableName: string): Promise<T[]> {
@@ -310,12 +313,16 @@ async function main(): Promise<void> {
 
   console.log('\n=== Escenario listo ===');
   console.log('\nResumen:');
-  console.log(`  Partidos:   mock-today-1 (ARG vs BRA), mock-today-2 (ESP vs FRA), mock-today-3 (GER vs ITA)`);
+  console.log(
+    `  Partidos:   mock-today-1 (ARG vs BRA), mock-today-2 (ESP vs FRA), mock-today-3 (GER vs ITA)`,
+  );
   console.log(`  StealPicks: alejandro.alazraqui → marco.munoz (mock-today-1)`);
   console.log(`              bruno.munoz → nicolas.sanchez (mock-today-2)`);
   console.log(`              simbad.peralta → thomas.colagiovanni (mock-today-3)`);
   console.log(`\nAhora podés ejecutar upload-matches con los resultados de hoy.`);
-  console.log(`Los kickoffAt de los 3 partidos son anteriores a la hora actual, asi que serán procesados.`);
+  console.log(
+    `Los kickoffAt de los 3 partidos son anteriores a la hora actual, asi que serán procesados.`,
+  );
 }
 
 main().catch((err) => {

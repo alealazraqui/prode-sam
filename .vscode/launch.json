@@ -190,6 +190,25 @@
     {
       "type": "node",
       "request": "launch",
+      "name": "Calculate stealers",
+      "program": "${workspaceFolder}/scripts/debug-invoke.ts",
+      "args": ["calculate-stealers", "${input:calculate_stealers_invocation}"],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "runtimeArgs": ["-r", "tsx/cjs/register"],
+      "envFile": "${workspaceFolder}/.env.local",
+      "env": {
+        "USERS_TABLE_NAME": "Users",
+        "STEALERS_TABLE_NAME": "Stealers",
+        "BLOCKED_VICTIMS_TABLE_NAME": "BlockedVictims",
+        "STEAL_PICKS_TABLE_NAME": "StealPicks",
+        "AWS_PROFILE": "prode-dev"
+      },
+      "skipFiles": ["<node_internals>/**"]
+    },
+    {
+      "type": "node",
+      "request": "launch",
       "name": "Upload matches",
       "program": "${workspaceFolder}/scripts/debug-invoke.ts",
       "args": ["upload-matches", "${input:upload_matches_invocation}"],
@@ -283,6 +302,15 @@
         { "label": "Victima bloqueada", "value": "steal-picks-blocked-victim" }
       ],
       "default": "steal-picks-success"
+    },
+    {
+      "id": "calculate_stealers_invocation",
+      "type": "pickString",
+      "description": "Calculate stealers: invocacion a ejecutar",
+      "options": [
+        { "label": "Rotar ladrones para un dia steal", "value": "calculate-stealers-success" }
+      ],
+      "default": "calculate-stealers-success"
     },
     {
       "id": "upload_matches_invocation",

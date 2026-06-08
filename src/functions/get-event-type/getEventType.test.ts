@@ -110,6 +110,28 @@ describe('getEventType', () => {
     });
   });
 
+  it('does not treat user as stealer when only registered for another dayId', async () => {
+    await withTestEnv(TEST_ENV, async () => {
+      vi.resetModules();
+      const { getDayType } = await import('@/shared/dynamo/getDayType');
+      const { getItem } = await import('@/shared/dynamo/getItem');
+      const { scanTable } = await import('@/shared/dynamo/scanTable');
+      const { getEventType } = await import('./getEventType');
+
+      vi.mocked(getDayType).mockResolvedValue('robo');
+      vi.mocked(getItem).mockResolvedValue(null);
+      vi.mocked(scanTable).mockResolvedValue([] satisfies BlockedVictimItem[]);
+
+      const result = await getEventType('alejandro');
+
+      expect(result.currentUserIsSteal).toBe(false);
+      expect(getItem).toHaveBeenCalledWith('Stealers', {
+        dayId: '2026-06-07',
+        stealerUsername: 'alejandro',
+      });
+    });
+  });
+
   it('returns currentUserIsSteal false with blocked victims when user is not a stealer', async () => {
     await withTestEnv(TEST_ENV, async () => {
       vi.resetModules();

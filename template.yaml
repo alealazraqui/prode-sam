@@ -408,6 +408,29 @@ Resources:
         Target: es2020
         Sourcemap: true
 
+  CalculateStealersFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: .
+      Handler: src/functions/calculate-stealers/handler.handler
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref StealersTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref BlockedVictimsTable
+        - DynamoDBReadPolicy:
+            TableName: !Ref StealPicksTable
+        - DynamoDBReadPolicy:
+            TableName: !Ref UsersTable
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        EntryPoints:
+          - src/functions/calculate-stealers/handler.ts
+        Minify: true
+        Target: es2020
+        Sourcemap: true
+
   GetEventTypeFunction:
     Type: AWS::Serverless::Function
     Properties:
