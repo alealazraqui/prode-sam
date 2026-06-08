@@ -395,6 +395,10 @@ Resources:
             TableName: !Ref UsersTable
         - DynamoDBReadPolicy:
             TableName: !Ref DayEventsTable
+        - DynamoDBReadPolicy:
+            TableName: !Ref StealPicksTable
+        - DynamoDBWritePolicy:
+            TableName: !Ref StealPicksTable
     Metadata:
       BuildMethod: esbuild
       BuildProperties:

@@ -27,12 +27,57 @@ Preguntar al usuario:
 
 ### 2. Obtener matchIds de DynamoDB (modos A y B)
 
+> **PowerShell**: nunca pasar JSON inline como argumento de AWS CLI (falla el escape de comillas).
+> Siempre escribir el JSON en un archivo temporal con `[System.IO.File]::WriteAllText` y usar `file://`.
+
+**Scan filtrado por rango de fechas:**
+
 ```powershell
 $env:AWS_PROFILE = "prode-dev"
-aws dynamodb scan --table-name Matches --output json
+
+# Escribir filtro en archivo temporal (sin BOM, sin problemas de escape)
+[System.IO.File]::WriteAllText(
+  "$PWD\tmp-filter.json",
+  '{":d1":{"S":"2026-06-07T00:00:00Z"},":d2":{"S":"2026-06-08T23:59:59Z"}}'
+)
+
+aws dynamodb scan `
+  --table-name Matches `
+  --filter-expression "kickoffAt BETWEEN :d1 AND :d2" `
+  --expression-attribute-values file://tmp-filter.json `
+  --projection-expression "matchId,homeTeamName,awayTeamName,kickoffAt" `
+  --output json | ConvertFrom-Json | Select-Object -ExpandProperty Items |
+  ForEach-Object {
+    [PSCustomObject]@{
+      matchId = $_.matchId.S; home = $_.homeTeamName.S
+      away    = $_.awayTeamName.S; kick = $_.kickoffAt.S
+    }
+  } | Sort-Object kick | Format-Table -AutoSize
 ```
 
-Filtrar por fecha (`kickoffAt`) indicada o la de hoy. Extraer `matchId`, equipos (`homeTeamName`, `awayTeamName`) y `kickoffAt`.
+**GetItem para un matchId conocido:**
+
+```powershell
+$env:AWS_PROFILE = "prode-dev"
+[System.IO.File]::WriteAllText("$PWD\tmp-key.json", '{"matchId":{"S":"<matchId>"}}')
+aws dynamodb get-item --table-name Matches --key file://tmp-key.json `
+  --projection-expression "matchId,homeTeamName,awayTeamName,kickoffAt" --output json
+```
+
+**Parsear un scan ya guardado localmente (sin red):**
+
+```powershell
+$data = Get-Content tmp-matches-scan.json -Encoding UTF8 -Raw | ConvertFrom-Json
+$data.Items |
+  ForEach-Object { [PSCustomObject]@{
+    matchId = $_.matchId.S; home = $_.homeTeamName.S
+    away    = $_.awayTeamName.S; kick = $_.kickoffAt.S
+  }} |
+  Where-Object { $_.kick -like '2026-06-07*' -or $_.kick -like '2026-06-08*' } |
+  Sort-Object kick | Format-Table -AutoSize
+```
+
+Extraer `matchId`, equipos (`homeTeamName`, `awayTeamName`) y `kickoffAt`.
 
 ### 3. Mapear resultados a matchIds
 
@@ -61,25 +106,34 @@ Para modo C: `{ "matches": [] }`.
 
 ### 5. Invocar la Lambda
 
-Tras aprobacion, resolver el nombre fisico de la funcion y ejecutar:
+Tras aprobacion, resolver el nombre fisico y ejecutar:
 
 ```powershell
 $env:AWS_PROFILE = "prode-dev"
-# En PowerShell usar archivo payload (evita problemas de escape de JSON inline)
-# Ejemplo: tmp-invoke.json con {"matches":[...]} o {"matches":[]}
+
+# 1. Resolver nombre fisico (solo si no se conoce)
+aws lambda list-functions `
+  --query "Functions[?contains(FunctionName,'UploadMatches')].FunctionName" `
+  --output text
+
+# 2. Escribir payload en archivo temporal (NUNCA JSON inline en PS)
+[System.IO.File]::WriteAllText("$PWD\tmp-invoke.json", '{
+  "matches": [
+    { "matchId": "...", "homeGoals": 2, "awayGoals": 1, "kickoffAt": "2026-06-07T21:00:00.000Z" }
+  ]
+}')
+
+# 3. Invocar
 aws lambda invoke `
-  --function-name <nombre-fisico-UploadMatchesFunction> `
+  --function-name prode-sam-UploadMatchesFunction-8R3RwAtzOAkX `
   --payload fileb://tmp-invoke.json `
   --cli-binary-format raw-in-base64-out `
-  response.json
-Get-Content response.json
+  tmp-response.json
+Get-Content tmp-response.json
 ```
 
-Resolver nombre fisico:
-
-```powershell
-aws lambda list-functions --query "Functions[?contains(FunctionName, 'UploadMatches')].FunctionName" --output text
-```
+> **Regla clave PowerShell**: siempre `[System.IO.File]::WriteAllText("$PWD\archivo.json", '...')` para crear JSON sin BOM.
+> Usar `fileb://` para `--payload` (binario) y `file://` para `--expression-attribute-values` / `--key`.
 
 Alternativa local (sin deploy): `sam local invoke UploadMatchesFunction -e src/functions/upload-matches/invocations/<archivo>.json --parameter-overrides JwtSecret=dev-secret-local`
 

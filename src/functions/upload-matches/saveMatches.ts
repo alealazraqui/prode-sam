@@ -2,13 +2,14 @@ import { environment } from '@/shared/config/environment';
 import { updateItem } from '@/shared/dynamo/updateItem';
 import type { UploadMatchInput } from './types';
 
-export async function saveMatches(matches: UploadMatchInput[]): Promise<void> {
-  if (matches.length === 0) {
-    return;
-  }
+export async function saveMatches(matches: UploadMatchInput[]): Promise<Set<string>> {
+  const now = new Date();
+  const pastMatches = matches.filter((m) => new Date(m.kickoffAt) <= now);
+
+  if (pastMatches.length === 0) return new Set();
 
   await Promise.all(
-    matches.map((match) =>
+    pastMatches.map((match) =>
       updateItem({
         tableName: environment.matchesTableName,
         key: { matchId: match.matchId },
@@ -22,4 +23,6 @@ export async function saveMatches(matches: UploadMatchInput[]): Promise<void> {
       }),
     ),
   );
+
+  return new Set(pastMatches.map((m) => m.matchId));
 }

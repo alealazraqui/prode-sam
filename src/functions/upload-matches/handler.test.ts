@@ -6,6 +6,7 @@ const TEST_ENV = {
   USERS_TABLE_NAME: 'Users',
   MATCHES_TABLE_NAME: 'Matches',
   PREDICTIONS_TABLE_NAME: 'Predictions',
+  STEAL_PICKS_TABLE_NAME: 'StealPicks',
   DAY_EVENTS_TABLE_NAME: 'DayEvents',
 };
 
@@ -32,7 +33,7 @@ describe('upload-matches handler', () => {
     vi.useRealTimers();
   });
 
-  it('returns 200 and rewrites predictions and users when matches are provided', async () => {
+  it('returns 200, updates prediction pointsCommon and rewrites user scores', async () => {
     await withTestEnv(TEST_ENV, async () => {
       vi.resetModules();
       const { scanTable } = await import('@/shared/dynamo/scanTable');
@@ -40,80 +41,8 @@ describe('upload-matches handler', () => {
       const { updateItem } = await import('@/shared/dynamo/updateItem');
       const { handler } = await import('./handler');
 
-      vi.mocked(scanTable).mockImplementation(async (tableName) => {
-        if (tableName === 'Predictions') {
-          return [
-            {
-              username: 'alice',
-              matchId: 'mock-m001',
-              homeGoals: 2,
-              awayGoals: 1,
-              updatedAt: '2026-06-01T12:00:00.000Z',
-              kickoffAt: '2026-06-01T18:00:00.000Z',
-            },
-          ];
-        }
-        if (tableName === 'Matches') {
-          return [
-            {
-              matchId: 'mock-m001',
-              homeTeamName: 'Home',
-              homeTeamCode: 'HOM',
-              awayTeamName: 'Away',
-              awayTeamCode: 'AWY',
-              homeGoals: 1,
-              awayGoals: 0,
-              kickoffAt: '2026-06-01T18:00:00.000Z',
-              status: 2,
-              isFirstRound: true,
-            },
-          ];
-        }
-        return [{ username: 'alice', password: 'secret' }];
-      });
-
-      const response = await handler({
-        matches: [
-          {
-            matchId: 'mock-m001',
-            homeGoals: 2,
-            awayGoals: 1,
-            kickoffAt: '2026-06-01T18:00:00.000Z',
-          },
-        ],
-      });
-
-      expect(response).toEqual({
-        statusCode: 200,
-        body: JSON.stringify({ ok: true }),
-      });
-      expect(putItem).toHaveBeenCalledWith('Predictions', {
-        username: 'alice',
-        matchId: 'mock-m001',
-        homeGoals: 2,
-        awayGoals: 1,
-        updatedAt: '2026-06-01T12:00:00.000Z',
-        kickoffAt: '2026-06-01T18:00:00.000Z',
-        pointsCommon: 3,
-      });
-      expect(updateItem).toHaveBeenCalledWith(
-        expect.objectContaining({
-          tableName: 'Users',
-          key: { username: 'alice' },
-        }),
-      );
-    });
-  });
-
-  it('returns 200 and skips prediction writes when matches array is empty', async () => {
-    await withTestEnv(TEST_ENV, async () => {
-      vi.resetModules();
-      const { scanTable } = await import('@/shared/dynamo/scanTable');
-      const { putItem } = await import('@/shared/dynamo/putItem');
-      const { updateItem } = await import('@/shared/dynamo/updateItem');
-      const { handler } = await import('./handler');
-
-      vi.mocked(scanTable).mockImplementation(async (tableName) => {
+      // Simulate DB state after updatePredictionPoints writes pointsCommon: 3
+      vi.mocked(scanTable).mockImplementation(async (tableName: string) => {
         if (tableName === 'Predictions') {
           return [
             {
@@ -127,23 +56,56 @@ describe('upload-matches handler', () => {
             },
           ];
         }
-        if (tableName === 'Matches') {
+        if (tableName === 'StealPicks') return [];
+        return [{ username: 'alice', password: 'secret' }]; // Users
+      });
+
+      const response = await handler({
+        matches: [
+          {
+            matchId: 'mock-m001',
+            homeGoals: 2,
+            awayGoals: 1,
+            kickoffAt: '2026-06-01T18:00:00.000Z',
+          },
+        ],
+      });
+
+      expect(response).toEqual({ statusCode: 200, body: JSON.stringify({ ok: true }) });
+      expect(putItem).toHaveBeenCalledWith(
+        'Predictions',
+        expect.objectContaining({ username: 'alice', matchId: 'mock-m001', pointsCommon: 3 }),
+      );
+      expect(updateItem).toHaveBeenCalledWith(
+        expect.objectContaining({ tableName: 'Users', key: { username: 'alice' } }),
+      );
+    });
+  });
+
+  it('returns 200 and skips prediction writes when matches array is empty', async () => {
+    await withTestEnv(TEST_ENV, async () => {
+      vi.resetModules();
+      const { scanTable } = await import('@/shared/dynamo/scanTable');
+      const { putItem } = await import('@/shared/dynamo/putItem');
+      const { updateItem } = await import('@/shared/dynamo/updateItem');
+      const { handler } = await import('./handler');
+
+      vi.mocked(scanTable).mockImplementation(async (tableName: string) => {
+        if (tableName === 'Predictions') {
           return [
             {
+              username: 'alice',
               matchId: 'mock-m001',
-              homeTeamName: 'Home',
-              homeTeamCode: 'HOM',
-              awayTeamName: 'Away',
-              awayTeamCode: 'AWY',
               homeGoals: 2,
               awayGoals: 1,
+              updatedAt: '2026-06-01T12:00:00.000Z',
               kickoffAt: '2026-06-01T18:00:00.000Z',
-              status: 2,
-              isFirstRound: true,
+              pointsCommon: 3,
             },
           ];
         }
-        return [{ username: 'alice', password: 'secret' }];
+        if (tableName === 'StealPicks') return [];
+        return [{ username: 'alice', password: 'secret' }]; // Users
       });
 
       const response = await handler({ matches: [] });
@@ -151,10 +113,40 @@ describe('upload-matches handler', () => {
       expect(response.statusCode).toBe(200);
       expect(putItem).not.toHaveBeenCalled();
       expect(updateItem).toHaveBeenCalledWith(
-        expect.objectContaining({
-          tableName: 'Users',
-          key: { username: 'alice' },
-        }),
+        expect.objectContaining({ tableName: 'Users', key: { username: 'alice' } }),
+      );
+    });
+  });
+
+  it('skips future matches and does not write predictions for them', async () => {
+    await withTestEnv(TEST_ENV, async () => {
+      vi.resetModules();
+      const { scanTable } = await import('@/shared/dynamo/scanTable');
+      const { putItem } = await import('@/shared/dynamo/putItem');
+      const { updateItem } = await import('@/shared/dynamo/updateItem');
+      const { handler } = await import('./handler');
+
+      vi.mocked(scanTable).mockImplementation(async (tableName: string) => {
+        if (tableName === 'Predictions') return [];
+        if (tableName === 'StealPicks') return [];
+        return [];
+      });
+
+      const response = await handler({
+        matches: [
+          {
+            matchId: 'future-m001',
+            homeGoals: 1,
+            awayGoals: 0,
+            kickoffAt: '2026-06-10T18:00:00.000Z',
+          },
+        ],
+      });
+
+      expect(response.statusCode).toBe(200);
+      expect(putItem).not.toHaveBeenCalled();
+      expect(updateItem).not.toHaveBeenCalledWith(
+        expect.objectContaining({ tableName: 'Matches' }),
       );
     });
   });

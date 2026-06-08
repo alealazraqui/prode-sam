@@ -1,116 +1,88 @@
-import type { MatchItem } from '@/functions/get-matches/types';
 import { environment } from '@/shared/config/environment';
 import { putItem } from '@/shared/dynamo/putItem';
 import { scanTable } from '@/shared/dynamo/scanTable';
 import { scoreCalculator } from '@/shared/scoring/scoreCalculator';
 import type { ScoringMatchInput } from '@/shared/scoring/types';
 import type { PredictionItem } from '@/shared/types/predictionItem';
+import type { StealPickItem } from '@/shared/types/stealPickItem';
 import type { UserItem } from '@/shared/types/userItem';
 import { computeRanking } from './computeRanking';
 import { computeUserScores } from './computeUserScores';
 import { saveMatches } from './saveMatches';
 import type { UploadMatchInput } from './types';
+import { updateStealPicksStolenPoints } from './updateStealPicksStolenPoints';
 import { updateUsers } from './updateUsers';
-
-function buildMatchLookup(
-  scannedMatches: MatchItem[],
-  uploadedMatches: UploadMatchInput[],
-): Map<string, ScoringMatchInput> {
-  const matchLookup = new Map<string, ScoringMatchInput>();
-
-  for (const match of scannedMatches) {
-    if (match.status === 2) {
-      matchLookup.set(match.matchId, {
-        status: 2,
-        homeGoals: match.homeGoals,
-        awayGoals: match.awayGoals,
-      });
-    }
-  }
-
-  for (const match of uploadedMatches) {
-    matchLookup.set(match.matchId, {
-      status: 2,
-      homeGoals: match.homeGoals,
-      awayGoals: match.awayGoals,
-    });
-  }
-
-  return matchLookup;
-}
-
-function groupPredictionsByUser(predictions: PredictionItem[]): Map<string, PredictionItem[]> {
-  const predictionsByUser = new Map<string, PredictionItem[]>();
-
-  for (const prediction of predictions) {
-    const userPredictions = predictionsByUser.get(prediction.username) ?? [];
-    userPredictions.push(prediction);
-    predictionsByUser.set(prediction.username, userPredictions);
-  }
-
-  return predictionsByUser;
-}
-
-async function rewriteAffectedPredictions(
-  allPredictions: PredictionItem[],
-  uploadedMatches: UploadMatchInput[],
-): Promise<PredictionItem[]> {
-  const uploadedMatchIds = new Set(uploadedMatches.map((match) => match.matchId));
-  const uploadedLookup = new Map(uploadedMatches.map((match) => [match.matchId, match]));
-  const updatedPredictions = [...allPredictions];
-
-  await Promise.all(
-    updatedPredictions
-      .filter((prediction) => uploadedMatchIds.has(prediction.matchId))
-      .map(async (prediction) => {
-        const uploadedMatch = uploadedLookup.get(prediction.matchId);
-        if (!uploadedMatch) {
-          return;
-        }
-
-        const scoringMatch: ScoringMatchInput = {
-          status: 2,
-          homeGoals: uploadedMatch.homeGoals,
-          awayGoals: uploadedMatch.awayGoals,
-        };
-        const pointsCommon = scoreCalculator(prediction, scoringMatch).pointsCommon;
-        const updatedPrediction = { ...prediction, pointsCommon };
-
-        await putItem(environment.predictionsTableName, updatedPrediction);
-
-        const predictionIndex = updatedPredictions.findIndex(
-          (item) => item.username === prediction.username && item.matchId === prediction.matchId,
-        );
-        if (predictionIndex >= 0) {
-          updatedPredictions[predictionIndex] = updatedPrediction;
-        }
-      }),
-  );
-
-  return updatedPredictions;
-}
 
 export async function runScoringRecalculation(matches: UploadMatchInput[]): Promise<void> {
   const now = new Date();
-  let allPredictions = await scanTable<PredictionItem>(environment.predictionsTableName);
-  const scannedMatches = await scanTable<MatchItem>(environment.matchesTableName);
-  const users = await scanTable<UserItem>(environment.usersTableName);
 
-  if (matches.length > 0) {
-    await saveMatches(matches);
-    allPredictions = await rewriteAffectedPredictions(allPredictions, matches);
+  // Step 1: persist match results — future matches are skipped
+  const persistedMatchIds = await saveMatches(matches);
+  const persistedMatches = matches.filter((m) => persistedMatchIds.has(m.matchId));
+
+  // Step 2: update pointsCommon for predictions of uploaded matches
+  await updatePredictionPoints(persistedMatches);
+
+  // Step 3: update stolenPoints for steal picks of uploaded matches
+  await updateStealPicksStolenPoints(persistedMatchIds);
+
+  // Step 4: recompute scores for all users from scratch
+  await recalculateUserScores(now);
+}
+
+async function updatePredictionPoints(persistedMatches: UploadMatchInput[]): Promise<void> {
+  if (persistedMatches.length === 0) return;
+
+  const matchLookup = new Map<string, ScoringMatchInput>(
+    persistedMatches.map((m) => [
+      m.matchId,
+      { status: 2, homeGoals: m.homeGoals, awayGoals: m.awayGoals },
+    ]),
+  );
+
+  const allPredictions = await scanTable<PredictionItem>(environment.predictionsTableName);
+
+  await Promise.all(
+    allPredictions
+      .filter((p) => matchLookup.has(p.matchId))
+      .map(async (prediction) => {
+        const match = matchLookup.get(prediction.matchId)!;
+        const pointsCommon = scoreCalculator(prediction, match).pointsCommon;
+        await putItem(environment.predictionsTableName, { ...prediction, pointsCommon });
+      }),
+  );
+}
+
+async function recalculateUserScores(now: Date): Promise<void> {
+  const [allPredictions, allStealPicks, users] = await Promise.all([
+    scanTable<PredictionItem>(environment.predictionsTableName),
+    scanTable<StealPickItem>(environment.stealPicksTableName),
+    scanTable<UserItem>(environment.usersTableName),
+  ]);
+
+  const predictionsByUser = groupPredictionsByUser(allPredictions, users);
+  const userScores = computeUserScores(predictionsByUser, allStealPicks, now);
+  const ranking = computeRanking(userScores);
+  await updateUsers(ranking);
+}
+
+function groupPredictionsByUser(
+  predictions: PredictionItem[],
+  users: UserItem[],
+): Map<string, PredictionItem[]> {
+  const byUser = new Map<string, PredictionItem[]>();
+
+  for (const prediction of predictions) {
+    const list = byUser.get(prediction.username) ?? [];
+    list.push(prediction);
+    byUser.set(prediction.username, list);
   }
 
-  const matchLookup = buildMatchLookup(scannedMatches, matches);
-  const predictionsByUser = groupPredictionsByUser(allPredictions);
-
   for (const user of users) {
-    if (!predictionsByUser.has(user.username)) {
-      predictionsByUser.set(user.username, []);
+    if (!byUser.has(user.username)) {
+      byUser.set(user.username, []);
     }
   }
 
-  const userScores = computeUserScores(predictionsByUser, matchLookup, now);
-  const ranking = computeRanking(userScores);
-  await updateUsers(ranking);
+  return byUser;
 }
