@@ -122,12 +122,12 @@ Resources:
       TableName: Stealers
       BillingMode: PAY_PER_REQUEST
       AttributeDefinitions:
-        - AttributeName: calendarDate
+        - AttributeName: dayId
           AttributeType: S
         - AttributeName: stealerUsername
           AttributeType: S
       KeySchema:
-        - AttributeName: calendarDate
+        - AttributeName: dayId
           KeyType: HASH
         - AttributeName: stealerUsername
           KeyType: RANGE

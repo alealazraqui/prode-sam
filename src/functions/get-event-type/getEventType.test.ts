@@ -87,7 +87,7 @@ describe('getEventType', () => {
 
       vi.mocked(getDayType).mockResolvedValue('robo');
       vi.mocked(getItem).mockResolvedValue({
-        calendarDate: '2026-06-07',
+        dayId: '2026-06-07',
         stealerUsername: 'alejandro',
       } satisfies StealerItem);
       vi.mocked(scanTable).mockResolvedValue([
@@ -103,7 +103,7 @@ describe('getEventType', () => {
         blockedUsernames: ['blocked-user', 'another-blocked'],
       });
       expect(getItem).toHaveBeenCalledWith('Stealers', {
-        calendarDate: '2026-06-07',
+        dayId: '2026-06-07',
         stealerUsername: 'alejandro',
       });
       expect(scanTable).toHaveBeenCalledWith('BlockedVictims');

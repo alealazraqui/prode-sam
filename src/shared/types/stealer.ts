@@ -1,6 +1,6 @@
 /** Shape of a row in the Stealers DynamoDB table. */
 export type StealerItem = {
-  calendarDate: string;
+  dayId: string;
   stealerUsername: string;
   matchId?: string;
   victimUsername?: string;

@@ -17,7 +17,7 @@ export async function validateStealPick(
   }
 
   const stealerRow = await getItem<StealerItem>(environment.stealersTableName, {
-    calendarDate: request.calendarDate,
+    dayId: request.calendarDate,
     stealerUsername,
   });
 

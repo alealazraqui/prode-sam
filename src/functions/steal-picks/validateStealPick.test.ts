@@ -91,7 +91,7 @@ describe('validateStealPick', () => {
       vi.mocked(getItem).mockImplementation(async (tableName) => {
         if (tableName === 'Stealers') {
           return {
-            calendarDate: REQUEST.calendarDate,
+            dayId: REQUEST.calendarDate,
             stealerUsername: 'stealer.user',
           } satisfies StealerItem;
         }
@@ -119,7 +119,7 @@ describe('validateStealPick', () => {
       vi.mocked(getItem).mockImplementation(async (tableName, key) => {
         if (tableName === 'Stealers') {
           return {
-            calendarDate: REQUEST.calendarDate,
+            dayId: REQUEST.calendarDate,
             stealerUsername: 'stealer.user',
           } satisfies StealerItem;
         }
@@ -151,7 +151,7 @@ describe('validateStealPick', () => {
       vi.mocked(getItem).mockImplementation(async (tableName) => {
         if (tableName === 'Stealers') {
           return {
-            calendarDate: REQUEST.calendarDate,
+            dayId: REQUEST.calendarDate,
             stealerUsername: 'stealer.user',
           } satisfies StealerItem;
         }
@@ -179,7 +179,7 @@ describe('validateStealPick', () => {
       vi.mocked(getItem).mockImplementation(async (tableName) => {
         if (tableName === 'Stealers') {
           return {
-            calendarDate: REQUEST.calendarDate,
+            dayId: REQUEST.calendarDate,
             stealerUsername: 'stealer.user',
           } satisfies StealerItem;
         }
@@ -214,7 +214,7 @@ describe('validateStealPick', () => {
       vi.mocked(getItem).mockImplementation(async (tableName) => {
         if (tableName === 'Stealers') {
           return {
-            calendarDate: REQUEST.calendarDate,
+            dayId: REQUEST.calendarDate,
             stealerUsername: 'stealer.user',
           } satisfies StealerItem;
         }
@@ -249,7 +249,7 @@ describe('validateStealPick', () => {
       vi.mocked(getItem).mockImplementation(async (tableName) => {
         if (tableName === 'Stealers') {
           return {
-            calendarDate: REQUEST.calendarDate,
+            dayId: REQUEST.calendarDate,
             stealerUsername: 'stealer.user',
           } satisfies StealerItem;
         }

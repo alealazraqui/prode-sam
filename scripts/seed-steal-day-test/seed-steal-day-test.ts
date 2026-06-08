@@ -45,11 +45,11 @@ async function main(): Promise<void> {
   // 2. Crear 2 stealers (alejandro y bruno) sin elección aún
   const stealers: StealerItem[] = [
     {
-      calendarDate: today,
+      dayId: today,
       stealerUsername: 'alejandro.alazraqui',
     },
     {
-      calendarDate: today,
+      dayId: today,
       stealerUsername: 'bruno.munoz',
     },
   ];

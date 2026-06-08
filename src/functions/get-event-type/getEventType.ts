@@ -25,7 +25,7 @@ export async function getEventType(username: string): Promise<EventTypeResponse>
 
   const [stealerRow, blockedVictims] = await Promise.all([
     getItem<StealerItem>(environment.stealersTableName, {
-      calendarDate,
+      dayId: calendarDate,
       stealerUsername: username,
     }),
     scanTable<BlockedVictimItem>(environment.blockedVictimsTableName),
