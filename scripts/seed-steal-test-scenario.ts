@@ -13,6 +13,7 @@
  */
 
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
+import { DayEventType } from '../src/shared/types/dayEventType';
 import {
   DeleteCommand,
   DynamoDBDocumentClient,
@@ -296,7 +297,7 @@ async function seedDayEvent(): Promise<void> {
   await client.send(
     new PutCommand({
       TableName: DAY_EVENTS_TABLE,
-      Item: { date: TODAY, eventType: 'robo' },
+      Item: { date: TODAY, eventType: DayEventType.Robo },
     }),
   );
   console.log(`  ✓ DayEvent ${TODAY}: robo`);

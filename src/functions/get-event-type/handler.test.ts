@@ -3,6 +3,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { mockApiGatewayEvent } from '@/shared/test/mockApiGatewayEvent';
 import { parseHttpResponseBody } from '@/shared/test/parseHttpResponseBody';
 import { withTestEnv } from '@/shared/test/withTestEnv';
+import { DayEventType } from '@/shared/types/dayEventType';
 import type { EventTypeResponse } from './types';
 
 const TEST_ENV = {
@@ -20,16 +21,18 @@ vi.mock('./getEventType', () => ({
 }));
 
 describe('get-event-type handler', () => {
-  it('returns 200 with event type context on a common day', async () => {
+  it('returns 200 with all day events on a common day', async () => {
     await withTestEnv(TEST_ENV, async () => {
       vi.resetModules();
       const { getEventType } = await import('./getEventType');
       const { handler } = await import('./handler');
 
       const eventTypeResponse: EventTypeResponse = {
-        eventType: 'common',
-        currentUserIsSteal: false,
-        blockedUsernames: [],
+        today: '2026-06-07',
+        days: {
+          '2026-06-07': { eventType: DayEventType.Comun },
+          '2026-06-12': { eventType: DayEventType.Robo },
+        },
       };
       vi.mocked(getEventType).mockResolvedValue(eventTypeResponse);
 
@@ -47,16 +50,21 @@ describe('get-event-type handler', () => {
     });
   });
 
-  it('returns 200 with currentUserIsSteal true on a steal day', async () => {
+  it('returns 200 with steal context when today is a steal day', async () => {
     await withTestEnv(TEST_ENV, async () => {
       vi.resetModules();
       const { getEventType } = await import('./getEventType');
       const { handler } = await import('./handler');
 
       const eventTypeResponse: EventTypeResponse = {
-        eventType: 'steal',
-        currentUserIsSteal: true,
-        blockedUsernames: ['blocked-user'],
+        today: '2026-06-07',
+        days: {
+          '2026-06-07': { eventType: DayEventType.Robo },
+        },
+        stealContext: {
+          currentUserIsSteal: true,
+          blockedUsernames: ['blocked-user'],
+        },
       };
       vi.mocked(getEventType).mockResolvedValue(eventTypeResponse);
 

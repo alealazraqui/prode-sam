@@ -1,4 +1,5 @@
 import { getDayType } from '@/shared/dynamo/getDayType';
+import { DayEventType } from '@/shared/types/dayEventType';
 import { clearBlockedVictims } from './clearBlockedVictims';
 import { clearStealers } from './clearStealers';
 import { fetchBottom3 } from './fetchBottom3';
@@ -13,7 +14,7 @@ export async function handler(
   const targetDayId = event.targetDayId;
   const dayType = await getDayType(targetDayId);
 
-  if (dayType !== 'robo') {
+  if (dayType !== DayEventType.Robo) {
     return {
       statusCode: 200,
       body: JSON.stringify({

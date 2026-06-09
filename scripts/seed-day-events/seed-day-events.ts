@@ -1,6 +1,7 @@
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import { DynamoDBDocumentClient, PutCommand, ScanCommand } from '@aws-sdk/lib-dynamodb';
-import type { DayEventItem, DayType } from '../../src/shared/types/dayEvent';
+import type { DayEventItem } from '../../src/shared/types/dayEvent';
+import { DayEventType } from '../../src/shared/types/dayEventType';
 
 type MatchKickoffRow = {
   kickoffAt: string;
@@ -102,11 +103,11 @@ function extractUniqueDates(matches: MatchKickoffRow[]): string[] {
   return [...dates].sort();
 }
 
-function pickRandomDayType(): DayType {
+function pickRandomDayType(): DayEventType {
   const r = Math.random();
-  if (r < 1 / 3) return 'common';
-  if (r < 2 / 3) return 'robo';
-  return 'players';
+  if (r < 1 / 3) return DayEventType.Comun;
+  if (r < 2 / 3) return DayEventType.Robo;
+  return DayEventType.Jugadores;
 }
 
 async function putDayEvent(

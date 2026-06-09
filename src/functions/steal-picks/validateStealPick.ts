@@ -4,6 +4,7 @@ import { getItem } from '@/shared/dynamo/getItem';
 import { BadRequestError } from '@/shared/errors/BadRequestError';
 import { ConflictError } from '@/shared/errors/ConflictError';
 import type { DayEventItem } from '@/shared/types/dayEvent';
+import { DayEventType } from '@/shared/types/dayEventType';
 import type { BlockedVictimItem, StealerItem } from '@/shared/types/stealer';
 import { getArgentinaDateStringFromIso } from './getArgentinaDateStringFromIso';
 import type { StealPickRequest } from './types';
@@ -29,7 +30,7 @@ export async function validateStealPick(
     date: request.calendarDate,
   });
 
-  if (dayEvent?.eventType !== 'robo') {
+  if (dayEvent?.eventType !== DayEventType.Robo) {
     throw new BadRequestError('Steal picks are only allowed on steal days');
   }
 

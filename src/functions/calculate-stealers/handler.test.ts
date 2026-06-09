@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { withTestEnv } from '@/shared/test/withTestEnv';
+import { DayEventType } from '@/shared/types/dayEventType';
 
 const TEST_ENV = {
   JWT_SECRET: 'test-secret',
@@ -47,7 +48,7 @@ describe('calculate-stealers handler', () => {
       const { deleteItem } = await import('@/shared/dynamo/deleteItem');
       const { handler } = await import('./handler');
 
-      vi.mocked(getDayType).mockResolvedValue('robo');
+      vi.mocked(getDayType).mockResolvedValue(DayEventType.Robo);
 
       vi.mocked(queryTable).mockResolvedValue([
         { dayId: '2026-06-07', stealerUsername: 'old-stealer' },
@@ -131,7 +132,7 @@ describe('calculate-stealers handler', () => {
       const { putItem } = await import('@/shared/dynamo/putItem');
       const { handler } = await import('./handler');
 
-      vi.mocked(getDayType).mockResolvedValue('robo');
+      vi.mocked(getDayType).mockResolvedValue(DayEventType.Robo);
 
       vi.mocked(scanTable).mockImplementation(async (tableName: string) => {
         if (tableName === 'Users') {
@@ -173,7 +174,7 @@ describe('calculate-stealers handler', () => {
       const { deleteItem } = await import('@/shared/dynamo/deleteItem');
       const { handler } = await import('./handler');
 
-      vi.mocked(getDayType).mockResolvedValue('common');
+      vi.mocked(getDayType).mockResolvedValue(DayEventType.Comun);
 
       const response = await handler({ targetDayId: '2026-06-07' });
 
@@ -182,7 +183,7 @@ describe('calculate-stealers handler', () => {
         ok: true,
         skipped: true,
         targetDayId: '2026-06-07',
-        dayType: 'common',
+        dayType: DayEventType.Comun,
       });
       expect(getDayType).toHaveBeenCalledWith('2026-06-07');
       expect(queryTable).not.toHaveBeenCalled();
