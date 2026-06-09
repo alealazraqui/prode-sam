@@ -147,6 +147,23 @@
     {
       "type": "node",
       "request": "launch",
+      "name": "Get lineup picks",
+      "program": "${workspaceFolder}/scripts/debug-invoke.ts",
+      "args": ["get-lineup-picks", "${input:get_lineup_picks_invocation}"],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "runtimeArgs": ["-r", "tsx/cjs/register"],
+      "envFile": "${workspaceFolder}/.env.local",
+      "env": {
+        "USERS_TABLE_NAME": "Users",
+        "LINEUP_PICKS_TABLE_NAME": "LineupPicks",
+        "AWS_PROFILE": "prode-dev"
+      },
+      "skipFiles": ["<node_internals>/**"]
+    },
+    {
+      "type": "node",
+      "request": "launch",
       "name": "Get event type",
       "program": "${workspaceFolder}/scripts/debug-invoke.ts",
       "args": ["get-event-type", "${input:get_event_type_invocation}"],
@@ -282,6 +299,16 @@
         { "label": "Listado de predicciones", "value": "get-predictions-success" }
       ],
       "default": "get-predictions-success"
+    },
+    {
+      "id": "get_lineup_picks_invocation",
+      "type": "pickString",
+      "description": "Get lineup picks: invocacion a ejecutar",
+      "options": [
+        { "label": "Listado de lineup picks", "value": "get-lineup-picks-success" },
+        { "label": "Sin contexto de authorizer", "value": "get-lineup-picks-unauthorized" }
+      ],
+      "default": "get-lineup-picks-success"
     },
     {
       "id": "get_event_type_invocation",

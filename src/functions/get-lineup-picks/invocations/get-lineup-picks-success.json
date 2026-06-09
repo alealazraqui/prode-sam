@@ -1,0 +1,33 @@
+{
+  "version": "2.0",
+  "routeKey": "GET /lineup-picks",
+  "rawPath": "/lineup-picks",
+  "rawQueryString": "",
+  "headers": {
+    "authorization": "Bearer placeholder-token"
+  },
+  "requestContext": {
+    "accountId": "123456789012",
+    "apiId": "local",
+    "domainName": "localhost",
+    "domainPrefix": "localhost",
+    "http": {
+      "method": "GET",
+      "path": "/lineup-picks",
+      "protocol": "HTTP/1.1",
+      "sourceIp": "127.0.0.1",
+      "userAgent": "manual-invoke"
+    },
+    "requestId": "local-get-lineup-picks-success",
+    "routeKey": "GET /lineup-picks",
+    "stage": "$default",
+    "time": "01/Jan/2024:00:00:00 +0000",
+    "timeEpoch": 1704067200000,
+    "authorizer": {
+      "lambda": {
+        "username": "alejandro.alazraqui"
+      }
+    }
+  },
+  "isBase64Encoded": false
+}

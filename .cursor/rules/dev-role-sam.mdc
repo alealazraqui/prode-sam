@@ -81,8 +81,9 @@ Detalle y ejemplos: `docs/architecture.md` § 11.
 
 ## Estilo de cada Lambda
 
-- `handler.ts` pequeño y declarativo: recibe evento → parsea input → ejecuta pasos → respuesta HTTP estandarizada → delega errores a `handleError`.
-- La lógica del caso de uso se divide en funciones pequeñas y explícitas, legibles de arriba hacia abajo.
+- `handler.ts`: **solo wiring HTTP** — extraer identidad/parsear input, invocar orquestador, `createHttpResponse`, `handleError`. Detalle en `functional-programming.mdc`.
+- `<getX>.ts` (orquestador): coordina los pasos del caso de uso; helpers internos en el mismo archivo salvo que el paso justifique archivo propio.
+- La lógica del caso de uso se divide en funciones pequeñas y explícitas, legibles de arriba hacia abajo (orden top-down obligatorio).
 
 ## Lineamientos
 

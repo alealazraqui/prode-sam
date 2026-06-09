@@ -1,135 +1,223 @@
 ---
-description: Lineamientos de programacion funcional para prode-sam. Estructura de carpetas, patron orquestador y orden top-down de funciones.
+description: Estructura de Lambdas SAM, handler vs orquestador, top-down, separacion de archivos y estilo funcional en prode-sam.
 alwaysApply: true
 ---
 
 # Programacion Funcional - prode-sam
 
-## Patron Orquestador
+Reglas de estilo y organizacion **solo para el backend** (`prode-sam`).
+No aplican al frontend (`Prode-FE-`); su arquitectura vive en `Prode-FE-/docs/architecture.md`.
 
-Cada Lambda tiene un unico punto de entrada: `handler.ts`. Este archivo actua como **orquestador**: recibe el evento, coordina los pasos del caso de uso en orden y devuelve la respuesta. No contiene logica de negocio directa; delega en funciones nombradas.
+Stack, criterio de `shared/` e infra SAM: ver `dev-role-sam.mdc` y `docs/architecture.md`.
+Esta regla detalla **como escribir codigo dentro de cada Lambda** sin contradecir esos documentos.
+
+Organizar por caso de uso en `src/functions/<caso-de-uso>/`, no por capas tecnicas globales
+(`controllers/`, `services/`, `repositories/`, `dao/`).
+
+## Patron handler + orquestador
+
+Dos roles distintos en archivos separados:
+
+| Archivo | Rol |
+| ------- | --- |
+| `handler.ts` | **Punto de entrada HTTP.** Solo wiring: extraer identidad/parsear input, invocar el orquestador, `createHttpResponse`, `handleError`. Sin logica de negocio. |
+| `get<MiCaso>.ts` | **Orquestador.** Coordina los pasos del caso de uso en orden y retorna el payload de respuesta. Delega en funciones nombradas. |
+
+Convencion de nombre del orquestador: `getPredictions.ts`, `getLineupPicks.ts`, `savePredictions.ts`
+(verbo del caso de uso + sustantivo). No usar prefijo `run` en este repo.
 
 ```typescript
-// handler.ts — orquestador
+// handler.ts — solo wiring HTTP
+import type { APIGatewayProxyEventV2, APIGatewayProxyResultV2 } from 'aws-lambda';
+import { extractAuthenticatedUsername } from '@/shared/auth/extractAuthenticatedUsername';
+import { handleError } from '@/shared/errors/handleError';
+import { createHttpResponse } from '@/shared/http/createHttpResponse';
+import { getLineupPicks } from './getLineupPicks';
+
 export const handler = async (event: APIGatewayProxyEventV2): Promise<APIGatewayProxyResultV2> => {
   try {
-    const input = parseInput(event);
-    const result = await executeStep(input);
-    return buildResponse(result);
+    const username = extractAuthenticatedUsername(event);
+    const result = await getLineupPicks(username);
+    return createHttpResponse(200, result);
   } catch (error) {
     return handleError(error);
   }
 };
 ```
 
-Regla: si el handler necesita un comentario para entender que hace un bloque, ese bloque debe ser una funcion con nombre descriptivo.
+```typescript
+// getLineupPicks.ts — orquestador del caso de uso
+export async function getLineupPicks(authUsername: string) {
+  const [allPastItems, myFutureItems] = await Promise.all([
+    fetchAllPastPicks(),
+    fetchMyFuturePicks(authUsername),
+  ]);
+  return {
+    allPastPicks: mapItemsToResponses(allPastItems),
+    myFuturePicks: mapItemsToResponses(myFutureItems),
+  };
+}
+// helpers internos debajo, en orden top-down (ver seccion correspondiente)
+```
 
-## Estructura de Carpetas
+Si un bloque del orquestador necesita comentario para entenderse, extraerlo a una funcion con
+nombre descriptivo (en el mismo archivo o en `<paso>.ts` segun complejidad).
 
-Cada Lambda vive en su propia carpeta bajo `src/functions/<caso-de-uso>/`:
+Referencia: `src/functions/get-predictions/`, `src/functions/get-lineup-picks/`.
+
+## Estructura de una Lambda
 
 ```
 src/functions/<caso-de-uso>/
-  handler.ts       → orquestador: coordina pasos, sin logica de negocio directa
-  types.ts         → tipos e interfaces especificos de esta Lambda
-  *.ts             → funciones de pasos u utilidades (ver criterio abajo)
+  handler.ts              → punto de entrada HTTP (solo wiring)
+  get<MiCaso>.ts          → orquestador del caso de uso
+  invocations/*.json      → payloads para debug (ver lambda-invocations.mdc)
+  types.ts                → tipos especificos de esta Lambda
+  <pasos>.ts              → archivos por responsabilidad (ver criterio abajo)
+  validations/            → subcarpeta si hay 3+ archivos de validacion
 ```
 
-### Organizacion de archivos dentro de una Lambda
+Convenciones de nombres para pasos: `parseX`, `validateX`, `fetchX`, `buildX`, `saveX`, `mapXToY`.
 
-No imponer un archivo fijo por Lambda. Partir en archivos separados **solo cuando valga la pena encapsular** (responsabilidad clara, reutilizacion dentro del mismo caso de uso, o archivo que crece demasiado).
+Lambdas sin HTTP (ej. `jwt-authorizer`) siguen el mismo criterio: `handler.ts` minimo + orquestador
+o pasos nombrados si el flujo lo amerita.
 
-- Funciones **muy internas** a un paso (helpers de una sola funcion, transformaciones puntuales): mantenerlas en el **mismo archivo** que quien las invoca, respetando orden top-down.
-- Pasos del flujo con responsabilidad propia y legible por separado (ej. validacion, autenticacion, respuesta): pueden ir en archivos distintos si mejora la lectura.
-- El criterio es pragmatico: menos archivos mientras el flujo se entienda; mas archivos cuando el encapsulado aporta claridad.
+## Cuando separar en archivos distintos
 
-Extraer a `src/shared/` solo lo verdaderamente transversal (http, errors, dynamo, auth de verificacion, config).
+**Regla base: el criterio es complejidad y volumen de codigo, no "una funcion = un archivo".**
+
+### Mismo archivo — logica cohesiva y acotada
+
+Si una funcion principal tiene helpers internos y el conjunto es pequeno y legible,
+todo va en el **mismo archivo**, respetando orden top-down.
+
+```typescript
+// getLineupPicks.ts
+export async function getLineupPicks(authUsername: string) { ... }
+function mapItemsToResponses(items) { ... }
+function mapLineupPickToResponse(item) { ... }
+```
+
+### Archivo separado — responsabilidad con logica propia
+
+Separar cuando **un paso tiene su propia logica interna con multiples funciones** o I/O
+identificable como frontera del flujo (ej. lectura DynamoDB con filtrado de dominio).
+
+| Justifica archivo separado                     | No justifica archivo separado            |
+| ---------------------------------------------- | ---------------------------------------- |
+| Validacion con 3+ reglas y funciones propias   | Funcion de 5 lineas + helper de 3 lineas |
+| Fetch con filtrado de dominio e I/O propio     | Mapper de una sola transformacion        |
+| Mapeo con transformaciones propias no triviales| Helper que solo acorta una linea larga   |
+
+Ejemplos validos de archivo separado: `fetchAllPastPicks.ts`, `fetchMyFuturePicks.ts`,
+`validateStealPick.ts`, `parseSavePredictionsBody.ts`.
+
+Ejemplo que **no** justifica archivo propio: `mapLineupPickToResponse.ts` de ~10 lineas
+usado solo por el orquestador → va como helper en `getLineupPicks.ts`.
+
+Si el mismo mapper lo usan **2+ Lambdas** → mover a `src/shared/mappers/` (criterio en `dev-role-sam.mdc`).
+
+### Subcarpeta — 3+ archivos de la misma categoria
+
+```
+src/functions/save-predictions/
+  handler.ts
+  savePredictions.ts
+  validations/
+    validateBatch.ts
+    ...
+  types.ts
+```
+
+No crear la subcarpeta de forma anticipada.
+
+### Resumen
+
+| Situacion                                         | Decision                         |
+| ------------------------------------------------- | -------------------------------- |
+| Funcion principal + 1-2 helpers simples           | Mismo archivo                    |
+| Paso con 3+ funciones propias y logica no trivial | Archivo separado                 |
+| 3+ archivos de la misma categoria                 | Subcarpeta                       |
+| Logica usada por 2+ Lambdas                       | `src/shared/` (ver `dev-role-sam.mdc`) |
+
+Extraer a `shared/` solo lo verdaderamente transversal (http, errors, dynamo, auth, config).
 No poner logica de negocio del Prode en `shared/`.
 
 ## Orden Top-Down
 
-Las funciones dentro de un archivo se ordenan siguiendo el **arbol de llamadas en profundidad**: primero la funcion de nivel superior, luego cada funcion que esta invoca en el orden en que aparece en su cuerpo, y a continuacion los hijos de cada hijo. El lector puede seguir el flujo de arriba hacia abajo sin saltar el archivo.
+**Obligatorio.** Las funciones se ordenan siguiendo el arbol de llamadas en profundidad:
+primero la funcion de nivel superior, luego cada funcion que invoca en el orden en que
+aparece en su cuerpo, y a continuacion los hijos de cada hijo.
 
-Regla concreta: **una funcion aparece despues de la primera funcion que la llama, y antes de sus propios hijos.**
-
-```typescript
-// Arbol: main -> parseArgs, resolveTable, seedUsers -> loadUsers, toSeedItem, putUser
-
-// CORRECTO — depth-first, orden de llamada
-function main() { parseArgs(); resolveTable(); seedUsers(); }
-function parseArgs() { ... }          // 1er hijo de main
-function resolveTable() { ... }       // 2do hijo de main
-function seedUsers() { loadUsers(); toSeedItem(); putUser(); }  // 3er hijo de main
-function loadUsers() { ... }          // 1er hijo de seedUsers
-function toSeedItem() { ... }         // 2do hijo de seedUsers
-function putUser() { ... }            // 3er hijo de seedUsers
-
-// INCORRECTO — mezcla niveles sin respetar el arbol
-function putUser() { ... }
-function seedUsers() { ... }
-function parseArgs() { ... }
-function main() { ... }
-```
-
-### Checklist al crear o editar archivos con varias funciones
-
-Antes de dar por terminado un archivo, verificar:
-
-1. **Depth-first:** funcion llamadora primero; luego cada funcion que invoca, en el orden en que aparecen en su cuerpo; despues los hijos de cada hijo.
-2. **Anti-patron:** no definir helpers o utilidades internas al inicio del archivo si solo las usa una funcion exportada mas abajo.
-3. **Modulos parse + validate** (u otros pasos encadenados desde el handler): `parseX` → helpers usados solo por `parseX` → `validateX` → helpers usados solo por `validateX`.
+Regla: **una funcion aparece despues de la primera funcion que la llama, y antes de sus propios hijos.**
 
 ```typescript
-// Arbol del handler: parseUpdateCurrentUserInput -> extractOptionalApplicableString; validateUpdateCurrentUserInput
+// Arbol: getLineupPicks -> mapItemsToResponses -> mapLineupPickToResponse
 
 // CORRECTO
-export function parseUpdateCurrentUserInput(event) {
-  const alias = extractOptionalApplicableString(body.alias, 'alias');
-  // ...
+export async function getLineupPicks(authUsername) {
+  return { allPastPicks: mapItemsToResponses(allPastItems), ... };
 }
-function extractOptionalApplicableString(value, fieldName) { ... }
-export function validateUpdateCurrentUserInput(input) { ... }
+function mapItemsToResponses(items) {
+  return items.map(mapLineupPickToResponse);
+}
+function mapLineupPickToResponse(item) {
+  return { ...item, alias: item.alias ?? item.username, points: item.points ?? null };
+}
 
-// INCORRECTO — helper antes del parse que lo usa
-function extractOptionalApplicableString(value, fieldName) { ... }
-export function parseUpdateCurrentUserInput(event) { ... }
-export function validateUpdateCurrentUserInput(input) { ... }
+// INCORRECTO — helpers definidos antes del orquestador que los usa
+function mapLineupPickToResponse(item) { ... }
+export async function getLineupPicks(authUsername) { ... }
 ```
 
-## Capas de Abstraccion
+### Checklist al terminar un archivo
 
-Definir funciones en tres capas dentro de cada Lambda:
+1. **Depth-first:** llamadora primero; hijos en orden de invocacion; nietos despues.
+2. **Anti-patron:** no definir helpers al inicio si solo los usa una funcion mas abajo.
+3. **Parse + validate encadenados:** `parseX` → helpers de `parseX` → `validateX` → helpers de `validateX`.
 
-| Capa | Descripcion | Ejemplos |
-|---|---|---|
-| Orquestacion | Coordina el flujo completo | `handler`, `processRequest` |
-| Pasos del caso de uso | Un paso concreto del flujo | `validateInput`, `fetchUser`, `buildResponse` |
-| Utilidades internas | Transformaciones puntuales | `parseDate`, `formatAmount` |
+## Capas de abstraccion
 
-Cada funcion pertenece a una sola capa. Una funcion de paso no llama a otra de paso del mismo nivel si eso crea dependencias horizontales confusas; en ese caso, elevar a orquestacion.
+| Capa                  | Descripcion                | Ejemplos                                     |
+| --------------------- | -------------------------- | -------------------------------------------- |
+| Orquestacion          | Coordina el flujo          | `handler`, `getLineupPicks`                  |
+| Pasos del caso de uso | Un paso concreto           | `validateInput`, `fetchAllPastPicks`, `saveX`|
+| Utilidades internas   | Transformaciones puntuales | `mapLineupPickToResponse` |
 
-## Funciones
+Una funcion de paso no llama a otra de paso del mismo nivel si crea dependencias
+horizontales confusas; en ese caso, elevar a orquestacion.
 
-- Nombres descriptivos, verbo + sustantivo: `parseInput`, `validateUser`, `buildSuccessResponse`.
-- Una responsabilidad por funcion. Si necesita un comentario para separar "partes", dividir en funciones.
-- Preferir funciones puras: mismo input -> mismo output, sin efectos secundarios. Aislar los efectos (I/O, DynamoDB, llamadas externas) en funciones especificas y nombradas.
-- Sin clases salvo jerarquia de errores (`AppError`). Funciones y tipos, no instancias.
-- Sin estado mutable innecesario. Preferir `const` y valores inmutables.
-- Parametros maximos recomendados: 3. Si se necesitan mas, agrupar en un objeto tipado.
+## Estilo de funciones
+
+- Nombres descriptivos, verbo + sustantivo.
+- Una responsabilidad por funcion.
+- Preferir funciones puras; aislar I/O (DynamoDB, llamadas externas) en funciones nombradas.
+- Sin clases salvo jerarquia de errores (`AppError`).
+- Sin estado mutable innecesario. Preferir `const`.
+- Maximo 3 parametros recomendados; si se necesitan mas, agrupar en objeto tipado.
+
+## Errores
+
+Propagar con `throw`. El `handler.ts` usa `try/catch` **solo** para delegar en `handleError`
+y formatear la respuesta HTTP; no absorber errores ni ocultarlos.
+`AppError` y subclases para errores de negocio esperados.
+
+## Limites entre Lambdas
+
+- Una Lambda **no** importa archivos internos de otra Lambda (ej. no importar desde `@/functions/get-event-type/` salvo excepcion ya existente; preferir mover a `shared/` si 2+ Lambdas lo necesitan).
+- Si dos Lambdas necesitan el mismo helper/tipo/mapper → mover a `src/shared/`.
+- Logica de negocio de un solo caso queda en su Lambda.
+- `shared/` no importa desde `functions/`.
 
 ## I/O async sobre colecciones
 
-Cuando un paso ejecuta la **misma operacion async independiente** sobre cada elemento de un array (ej. varios `getItem` o `putItem` sin dependencia entre si), preferir estilo declarativo:
+Misma operacion async independiente sobre cada elemento → estilo declarativo:
 
 ```typescript
-await Promise.all(
-  items.map((item) => doAsyncWork(item)),
-);
+await Promise.all(items.map((item) => doAsyncWork(item)));
 ```
 
-Reservar `for await` secuencial para cuando:
+`for await` secuencial solo cuando cada iteracion depende de la anterior o se necesita
+orden explicito (throttling).
 
-- Cada iteracion depende del resultado de la anterior.
-- Se necesita orden o side effects explicitos (logs por item, throttling).
-
-Referencia: `getPredictions` (lecturas paralelas), `fetchMatchesForPredictions` / `upsertPredictions` (batch DynamoDB).
+Referencia: `getPredictions`, `fetchMatchesForPredictions`, `upsertPredictions`.

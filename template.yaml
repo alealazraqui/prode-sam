@@ -368,6 +368,30 @@ Resources:
         Target: es2020
         Sourcemap: true
 
+  GetLineupPicksFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: .
+      Handler: src/functions/get-lineup-picks/handler.handler
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref LineupPicksTable
+      Events:
+        GetLineupPicksApi:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref ProdeHttpApi
+            Path: /lineup-picks
+            Method: GET
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        EntryPoints:
+          - src/functions/get-lineup-picks/handler.ts
+        Minify: true
+        Target: es2020
+        Sourcemap: true
+
   SavePredictionsFunction:
     Type: AWS::Serverless::Function
     Properties:
