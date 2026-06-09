@@ -12,23 +12,26 @@ const TEST_ENV = {
   STEAL_PICKS_TABLE_NAME: 'StealPicks',
 };
 
-const pastKickoffMatch: MatchItem = {
+const finishedMatch: MatchItem = {
   matchId: 'wc26-m001',
   homeTeamName: 'Argentina',
   homeTeamCode: 'AR',
   awayTeamName: 'Brasil',
   awayTeamCode: 'BR',
+  homeGoals: 2,
+  awayGoals: 1,
+  kickoffAt: '2020-01-01T00:00:00.000Z',
+  status: 2,
+  isFirstRound: true,
+};
+
+const unfinishedMatch: MatchItem = {
+  ...finishedMatch,
+  matchId: 'wc26-m003',
   homeGoals: null,
   awayGoals: null,
   kickoffAt: '2020-01-01T00:00:00.000Z',
   status: 1,
-  isFirstRound: true,
-};
-
-const futureKickoffMatch: MatchItem = {
-  ...pastKickoffMatch,
-  matchId: 'wc26-m003',
-  kickoffAt: '2099-01-01T00:00:00.000Z',
 };
 
 const pastStealPick: StealPickItem = {
@@ -61,13 +64,13 @@ describe('fetchPastStealPicks', () => {
     vi.useRealTimers();
   });
 
-  it('includes steal picks whose match kickoff already passed', async () => {
+  it('includes steal picks only for finished matches', async () => {
     await withTestEnv(TEST_ENV, async () => {
       vi.resetModules();
       const { scanTable } = await import('@/shared/dynamo/scanTable');
       vi.mocked(scanTable)
         .mockResolvedValueOnce([pastStealPick, futureStealPick])
-        .mockResolvedValueOnce([pastKickoffMatch, futureKickoffMatch]);
+        .mockResolvedValueOnce([finishedMatch, unfinishedMatch]);
 
       const { fetchPastStealPicks } = await import('./fetchPastStealPicks');
       const result = await fetchPastStealPicks();
@@ -78,13 +81,13 @@ describe('fetchPastStealPicks', () => {
     });
   });
 
-  it('returns empty array when no steal pick has a past kickoff', async () => {
+  it('returns empty array when steal picks belong to unfinished matches', async () => {
     await withTestEnv(TEST_ENV, async () => {
       vi.resetModules();
       const { scanTable } = await import('@/shared/dynamo/scanTable');
       vi.mocked(scanTable)
         .mockResolvedValueOnce([futureStealPick])
-        .mockResolvedValueOnce([futureKickoffMatch]);
+        .mockResolvedValueOnce([unfinishedMatch]);
 
       const { fetchPastStealPicks } = await import('./fetchPastStealPicks');
       const result = await fetchPastStealPicks();
