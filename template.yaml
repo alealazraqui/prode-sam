@@ -23,6 +23,7 @@ Globals:
         STEALERS_TABLE_NAME: !Ref StealersTable
         BLOCKED_VICTIMS_TABLE_NAME: !Ref BlockedVictimsTable
         STEAL_PICKS_TABLE_NAME: !Ref StealPicksTable
+        LINEUP_PICKS_TABLE_NAME: !Ref LineupPicksTable
         JWT_SECRET: !Ref JwtSecret
 
 Resources:
@@ -172,6 +173,24 @@ Resources:
               KeyType: HASH
           Projection:
             ProjectionType: ALL
+
+  LineupPicksTable:
+    Type: AWS::DynamoDB::Table
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Delete
+    Properties:
+      TableName: LineupPicks
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: eventDay
+          AttributeType: S
+        - AttributeName: username
+          AttributeType: S
+      KeySchema:
+        - AttributeName: eventDay
+          KeyType: HASH
+        - AttributeName: username
+          KeyType: RANGE
 
   JwtAuthorizerFunction:
     Type: AWS::Serverless::Function
@@ -535,6 +554,11 @@ Outputs:
     Value: !Ref StealPicksTable
     Export:
       Name: !Sub '${AWS::StackName}-StealPicksTableName'
+  LineupPicksTableName:
+    Description: DynamoDB LineupPicks table name (for seed scripts and Lambdas)
+    Value: !Ref LineupPicksTable
+    Export:
+      Name: !Sub '${AWS::StackName}-LineupPicksTableName'
   HttpApiUrl:
     Description: HTTP API base URL
     Value: !Sub 'https://${ProdeHttpApi}.execute-api.${AWS::Region}.amazonaws.com'

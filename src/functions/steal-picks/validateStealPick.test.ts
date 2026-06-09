@@ -98,7 +98,10 @@ describe('validateStealPick', () => {
         }
 
         if (tableName === 'DayEvents') {
-          return { date: REQUEST.calendarDate, eventType: DayEventType.Comun } satisfies DayEventItem;
+          return {
+            date: REQUEST.calendarDate,
+            eventType: DayEventType.Comun,
+          } satisfies DayEventItem;
         }
 
         return null;
@@ -126,7 +129,10 @@ describe('validateStealPick', () => {
         }
 
         if (tableName === 'DayEvents') {
-          return { date: REQUEST.calendarDate, eventType: DayEventType.Robo } satisfies DayEventItem;
+          return {
+            date: REQUEST.calendarDate,
+            eventType: DayEventType.Robo,
+          } satisfies DayEventItem;
         }
 
         if (tableName === 'BlockedVictims' && key.username === REQUEST.victimUsername) {
@@ -158,7 +164,10 @@ describe('validateStealPick', () => {
         }
 
         if (tableName === 'DayEvents') {
-          return { date: REQUEST.calendarDate, eventType: DayEventType.Robo } satisfies DayEventItem;
+          return {
+            date: REQUEST.calendarDate,
+            eventType: DayEventType.Robo,
+          } satisfies DayEventItem;
         }
 
         return null;
@@ -186,7 +195,10 @@ describe('validateStealPick', () => {
         }
 
         if (tableName === 'DayEvents') {
-          return { date: REQUEST.calendarDate, eventType: DayEventType.Robo } satisfies DayEventItem;
+          return {
+            date: REQUEST.calendarDate,
+            eventType: DayEventType.Robo,
+          } satisfies DayEventItem;
         }
 
         if (tableName === 'Matches') {
@@ -221,7 +233,10 @@ describe('validateStealPick', () => {
         }
 
         if (tableName === 'DayEvents') {
-          return { date: REQUEST.calendarDate, eventType: DayEventType.Robo } satisfies DayEventItem;
+          return {
+            date: REQUEST.calendarDate,
+            eventType: DayEventType.Robo,
+          } satisfies DayEventItem;
         }
 
         if (tableName === 'Matches') {
@@ -256,7 +271,10 @@ describe('validateStealPick', () => {
         }
 
         if (tableName === 'DayEvents') {
-          return { date: REQUEST.calendarDate, eventType: DayEventType.Robo } satisfies DayEventItem;
+          return {
+            date: REQUEST.calendarDate,
+            eventType: DayEventType.Robo,
+          } satisfies DayEventItem;
         }
 
         if (tableName === 'Matches') {

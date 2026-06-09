@@ -7,6 +7,7 @@ const TEST_ENV_DEFAULTS: Record<string, string> = {
   STEALERS_TABLE_NAME: 'Stealers',
   BLOCKED_VICTIMS_TABLE_NAME: 'BlockedVictims',
   STEAL_PICKS_TABLE_NAME: 'StealPicks',
+  LINEUP_PICKS_TABLE_NAME: 'LineupPicks',
 };
 
 export async function withTestEnv<T>(

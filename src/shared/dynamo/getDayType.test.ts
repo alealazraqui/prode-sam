@@ -36,7 +36,10 @@ describe('getDayType', () => {
       vi.resetModules();
       const { getItem } = await import('./getItem');
       const { getDayType } = await import('./getDayType');
-      vi.mocked(getItem).mockResolvedValue({ date: '2026-06-16', eventType: DayEventType.Jugadores });
+      vi.mocked(getItem).mockResolvedValue({
+        date: '2026-06-16',
+        eventType: DayEventType.Jugadores,
+      });
 
       const result = await getDayType('2026-06-16');
 
