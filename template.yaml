@@ -420,6 +420,30 @@ Resources:
         Target: es2020
         Sourcemap: true
 
+  UpdateLineupPointsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: .
+      Handler: src/functions/update-lineup-points/handler.handler
+      Policies:
+        - DynamoDBWritePolicy:
+            TableName: !Ref LineupPicksTable
+      Events:
+        UpdateLineupPointsApi:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref ProdeHttpApi
+            Path: /lineup-picks/points
+            Method: PATCH
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        EntryPoints:
+          - src/functions/update-lineup-points/handler.ts
+        Minify: true
+        Target: es2020
+        Sourcemap: true
+
   SavePredictionsFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -470,6 +494,8 @@ Resources:
             TableName: !Ref StealPicksTable
         - DynamoDBWritePolicy:
             TableName: !Ref StealPicksTable
+        - DynamoDBReadPolicy:
+            TableName: !Ref LineupPicksTable
     Metadata:
       BuildMethod: esbuild
       BuildProperties:

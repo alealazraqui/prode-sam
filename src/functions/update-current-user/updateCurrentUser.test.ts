@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { withTestEnv } from '@/shared/test/withTestEnv';
 import type { UserItem } from '@/shared/types/userItem';
 
@@ -27,6 +27,10 @@ vi.mock('@/shared/dynamo/putItem', () => ({
 }));
 
 describe('updateCurrentUser', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
   it('updates only alias and preserves password, score and rankingPosition', async () => {
     await withTestEnv(TEST_ENV, async () => {
       vi.resetModules();
@@ -50,6 +54,7 @@ describe('updateCurrentUser', () => {
         alias: 'Nuevo',
         score: 42,
         rankingPosition: 7,
+        rankingDif: 0,
       });
     });
   });
@@ -77,6 +82,7 @@ describe('updateCurrentUser', () => {
         alias: 'Ale',
         score: 42,
         rankingPosition: 7,
+        rankingDif: 0,
       });
     });
   });
@@ -107,6 +113,7 @@ describe('updateCurrentUser', () => {
         alias: 'Nuevo',
         score: 42,
         rankingPosition: 7,
+        rankingDif: 0,
       });
     });
   });

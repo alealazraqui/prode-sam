@@ -7,5 +7,6 @@ export function mapUserItemToPublicResponse(user: UserItem): PublicUserResponse 
     alias: user.alias ?? user.username,
     score: user.score ?? 0,
     rankingPosition: user.rankingPosition ?? 0,
+    rankingDif: user.rankingDif ?? 0,
   };
 }

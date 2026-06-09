@@ -5,4 +5,5 @@ export type UserItem = {
   password: string;
   score?: number;
   rankingPosition?: number;
+  rankingDif?: number;
 };

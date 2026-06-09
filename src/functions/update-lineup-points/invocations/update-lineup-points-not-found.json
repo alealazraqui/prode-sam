@@ -1,0 +1,35 @@
+{
+  "version": "2.0",
+  "routeKey": "PATCH /lineup-picks/points",
+  "rawPath": "/lineup-picks/points",
+  "rawQueryString": "",
+  "headers": {
+    "authorization": "Bearer placeholder-token",
+    "content-type": "application/json"
+  },
+  "body": "[{\"eventDay\":\"2026-06-15\",\"username\":\"missing-user\",\"points\":3}]",
+  "isBase64Encoded": false,
+  "requestContext": {
+    "accountId": "123456789012",
+    "apiId": "local",
+    "domainName": "localhost",
+    "domainPrefix": "localhost",
+    "http": {
+      "method": "PATCH",
+      "path": "/lineup-picks/points",
+      "protocol": "HTTP/1.1",
+      "sourceIp": "127.0.0.1",
+      "userAgent": "manual-invoke"
+    },
+    "requestId": "local-update-lineup-points-not-found",
+    "routeKey": "PATCH /lineup-picks/points",
+    "stage": "$default",
+    "time": "01/Jan/2024:00:00:00 +0000",
+    "timeEpoch": 1704067200000,
+    "authorizer": {
+      "lambda": {
+        "username": "alejandro.alazraqui"
+      }
+    }
+  }
+}

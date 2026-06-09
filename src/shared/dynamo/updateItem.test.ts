@@ -62,4 +62,25 @@ describe('updateItem', () => {
       ExpressionAttributeNames: { '#points': 'pointsCommon' },
     });
   });
+
+  it('includes condition expression when provided', async () => {
+    await updateItem({
+      tableName: 'LineupPicks',
+      key: { eventDay: '2026-06-15', username: 'user1' },
+      updateExpression: 'SET #points = :points',
+      expressionAttributeValues: { ':points': 4 },
+      expressionAttributeNames: { '#points': 'points' },
+      conditionExpression: 'attribute_exists(eventDay) AND attribute_exists(username)',
+    });
+
+    const command = vi.mocked(dynamoClient.send).mock.calls[0]?.[0];
+    expect(command?.input).toEqual({
+      TableName: 'LineupPicks',
+      Key: { eventDay: '2026-06-15', username: 'user1' },
+      UpdateExpression: 'SET #points = :points',
+      ExpressionAttributeValues: { ':points': 4 },
+      ExpressionAttributeNames: { '#points': 'points' },
+      ConditionExpression: 'attribute_exists(eventDay) AND attribute_exists(username)',
+    });
+  });
 });

@@ -1,11 +1,11 @@
-import type { UserRankingEntry } from './types';
+import type { ComputedRankingEntry } from './types';
 
-export function computeRanking(userScores: Map<string, number>): UserRankingEntry[] {
+export function computeRanking(userScores: Map<string, number>): ComputedRankingEntry[] {
   const sorted = [...userScores.entries()].sort(([, leftScore], [, rightScore]) => {
     return rightScore - leftScore;
   });
 
-  const ranking: UserRankingEntry[] = [];
+  const ranking: ComputedRankingEntry[] = [];
 
   for (let index = 0; index < sorted.length; index += 1) {
     const [username, score] = sorted[index];

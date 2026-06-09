@@ -16,6 +16,7 @@ describe('mapUserItemToPublicResponse', () => {
       alias: 'Ale',
       score: 42,
       rankingPosition: 3,
+      rankingDif: 0,
     });
     expect(result).not.toHaveProperty('password');
   });
@@ -32,6 +33,24 @@ describe('mapUserItemToPublicResponse', () => {
       alias: 'demo',
       score: 0,
       rankingPosition: 5,
+      rankingDif: 0,
+    });
+  });
+
+  it('maps rankingDif when present', () => {
+    expect(
+      mapUserItemToPublicResponse({
+        username: 'demo',
+        password: 'secret',
+        rankingPosition: 2,
+        rankingDif: 3,
+      }),
+    ).toEqual({
+      username: 'demo',
+      alias: 'demo',
+      score: 0,
+      rankingPosition: 2,
+      rankingDif: 3,
     });
   });
 });

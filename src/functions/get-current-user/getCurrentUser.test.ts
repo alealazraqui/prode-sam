@@ -37,6 +37,7 @@ describe('getCurrentUser', () => {
         alias: 'Ale',
         score: 42,
         rankingPosition: 3,
+        rankingDif: 0,
       });
       expect(result).not.toHaveProperty('password');
     });

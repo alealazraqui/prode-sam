@@ -8,10 +8,12 @@ export async function updateUsers(ranking: UserRankingEntry[]): Promise<void> {
       updateItem({
         tableName: environment.usersTableName,
         key: { username: entry.username },
-        updateExpression: 'SET score = :score, rankingPosition = :rankingPosition',
+        updateExpression:
+          'SET score = :score, rankingPosition = :rankingPosition, rankingDif = :rankingDif',
         expressionAttributeValues: {
           ':score': entry.score,
           ':rankingPosition': entry.rankingPosition,
+          ':rankingDif': entry.rankingDif,
         },
       }),
     ),

@@ -182,6 +182,22 @@
     {
       "type": "node",
       "request": "launch",
+      "name": "Update lineup points",
+      "program": "${workspaceFolder}/scripts/debug-invoke.ts",
+      "args": ["update-lineup-points", "${input:update_lineup_points_invocation}"],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "runtimeArgs": ["-r", "tsx/cjs/register"],
+      "envFile": "${workspaceFolder}/.env.local",
+      "env": {
+        "LINEUP_PICKS_TABLE_NAME": "LineupPicks",
+        "AWS_PROFILE": "prode-dev"
+      },
+      "skipFiles": ["<node_internals>/**"]
+    },
+    {
+      "type": "node",
+      "request": "launch",
       "name": "Get event type",
       "program": "${workspaceFolder}/scripts/debug-invoke.ts",
       "args": ["get-event-type", "${input:get_event_type_invocation}"],
@@ -337,6 +353,16 @@
         { "label": "Dia bloqueado (pasado)", "value": "save-lineup-pick-locked" }
       ],
       "default": "save-lineup-pick-success"
+    },
+    {
+      "id": "update_lineup_points_invocation",
+      "type": "pickString",
+      "description": "Update lineup points: invocacion a ejecutar",
+      "options": [
+        { "label": "Actualizar puntajes batch", "value": "update-lineup-points-success" },
+        { "label": "Pick inexistente", "value": "update-lineup-points-not-found" }
+      ],
+      "default": "update-lineup-points-success"
     },
     {
       "id": "get_event_type_invocation",

@@ -46,12 +46,14 @@ describe('getUsers', () => {
           alias: 'Ale',
           score: 42,
           rankingPosition: 2,
+          rankingDif: 0,
         },
         {
           username: 'demo',
           alias: 'demo',
           score: 10,
           rankingPosition: 1,
+          rankingDif: 0,
         },
       ]);
       expect(result.every((user) => !('password' in user))).toBe(true);

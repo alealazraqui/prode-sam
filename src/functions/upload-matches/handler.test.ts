@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { DayEventType } from '@/shared/types/dayEventType';
 import { withTestEnv } from '@/shared/test/withTestEnv';
 
 const TEST_ENV = {
@@ -7,6 +8,7 @@ const TEST_ENV = {
   MATCHES_TABLE_NAME: 'Matches',
   PREDICTIONS_TABLE_NAME: 'Predictions',
   STEAL_PICKS_TABLE_NAME: 'StealPicks',
+  LINEUP_PICKS_TABLE_NAME: 'LineupPicks',
   DAY_EVENTS_TABLE_NAME: 'DayEvents',
 };
 
@@ -20,6 +22,10 @@ vi.mock('@/shared/dynamo/putItem', () => ({
 
 vi.mock('@/shared/dynamo/updateItem', () => ({
   updateItem: vi.fn(),
+}));
+
+vi.mock('@/shared/dynamo/getDayType', () => ({
+  getDayType: vi.fn(),
 }));
 
 describe('upload-matches handler', () => {
@@ -36,10 +42,12 @@ describe('upload-matches handler', () => {
   it('returns 200, updates prediction pointsCommon and rewrites user scores', async () => {
     await withTestEnv(TEST_ENV, async () => {
       vi.resetModules();
+      const { getDayType } = await import('@/shared/dynamo/getDayType');
       const { scanTable } = await import('@/shared/dynamo/scanTable');
       const { putItem } = await import('@/shared/dynamo/putItem');
       const { updateItem } = await import('@/shared/dynamo/updateItem');
       const { handler } = await import('./handler');
+      vi.mocked(getDayType).mockResolvedValue(DayEventType.Comun);
 
       // Simulate DB state after updatePredictionPoints writes pointsCommon: 3
       vi.mocked(scanTable).mockImplementation(async (tableName: string) => {
@@ -57,6 +65,7 @@ describe('upload-matches handler', () => {
           ];
         }
         if (tableName === 'StealPicks') return [];
+        if (tableName === 'LineupPicks') return [];
         return [{ username: 'alice', password: 'secret' }]; // Users
       });
 
@@ -85,10 +94,12 @@ describe('upload-matches handler', () => {
   it('returns 200 and skips prediction writes when matches array is empty', async () => {
     await withTestEnv(TEST_ENV, async () => {
       vi.resetModules();
+      const { getDayType } = await import('@/shared/dynamo/getDayType');
       const { scanTable } = await import('@/shared/dynamo/scanTable');
       const { putItem } = await import('@/shared/dynamo/putItem');
       const { updateItem } = await import('@/shared/dynamo/updateItem');
       const { handler } = await import('./handler');
+      vi.mocked(getDayType).mockResolvedValue(DayEventType.Comun);
 
       vi.mocked(scanTable).mockImplementation(async (tableName: string) => {
         if (tableName === 'Predictions') {
@@ -105,6 +116,7 @@ describe('upload-matches handler', () => {
           ];
         }
         if (tableName === 'StealPicks') return [];
+        if (tableName === 'LineupPicks') return [];
         return [{ username: 'alice', password: 'secret' }]; // Users
       });
 
@@ -121,14 +133,17 @@ describe('upload-matches handler', () => {
   it('skips future matches and does not write predictions for them', async () => {
     await withTestEnv(TEST_ENV, async () => {
       vi.resetModules();
+      const { getDayType } = await import('@/shared/dynamo/getDayType');
       const { scanTable } = await import('@/shared/dynamo/scanTable');
       const { putItem } = await import('@/shared/dynamo/putItem');
       const { updateItem } = await import('@/shared/dynamo/updateItem');
       const { handler } = await import('./handler');
+      vi.mocked(getDayType).mockResolvedValue(DayEventType.Comun);
 
       vi.mocked(scanTable).mockImplementation(async (tableName: string) => {
         if (tableName === 'Predictions') return [];
         if (tableName === 'StealPicks') return [];
+        if (tableName === 'LineupPicks') return [];
         return [];
       });
 

@@ -7,6 +7,7 @@ export type UpdateItemParams = {
   updateExpression: string;
   expressionAttributeValues: Record<string, unknown>;
   expressionAttributeNames?: Record<string, string>;
+  conditionExpression?: string;
 };
 
 export async function updateItem(params: UpdateItemParams): Promise<void> {
@@ -19,6 +20,7 @@ export async function updateItem(params: UpdateItemParams): Promise<void> {
       ...(params.expressionAttributeNames
         ? { ExpressionAttributeNames: params.expressionAttributeNames }
         : {}),
+      ...(params.conditionExpression ? { ConditionExpression: params.conditionExpression } : {}),
     }),
   );
 }

@@ -5,10 +5,14 @@ export type UploadMatchInput = {
   kickoffAt: string;
 };
 
-export type UserRankingEntry = {
+export type ComputedRankingEntry = {
   username: string;
   score: number;
   rankingPosition: number;
+};
+
+export type UserRankingEntry = ComputedRankingEntry & {
+  rankingDif: number;
 };
 
 export type UploadMatchesEvent = {

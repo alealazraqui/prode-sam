@@ -47,6 +47,7 @@ describe('get-current-user handler', () => {
         alias: 'Ale',
         score: 42,
         rankingPosition: 5,
+        rankingDif: 0,
       });
     });
   });

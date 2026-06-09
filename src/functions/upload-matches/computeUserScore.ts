@@ -1,15 +1,14 @@
+import type { LineupPickItem } from '@/shared/types/lineupPickItem';
 import type { PredictionItem } from '@/shared/types/predictionItem';
 import type { StealPickItem } from '@/shared/types/stealPickItem';
 
 export function computeUserScore(
   predictions: PredictionItem[],
   stealPicks: StealPickItem[],
+  lineupPicks: LineupPickItem[],
   username: string,
-  now: Date,
 ): number {
-  const predictionScore = predictions
-    .filter((p) => new Date(p.kickoffAt) < now)
-    .reduce((sum, p) => sum + (p.pointsCommon ?? 0), 0);
+  const predictionScore = predictions.reduce((sum, p) => sum + (p.pointsCommon ?? 0), 0);
 
   const stealDelta = stealPicks.reduce((sum, sp) => {
     if (sp.stealerUsername === username) return sum + sp.stolenPoints;
@@ -17,5 +16,9 @@ export function computeUserScore(
     return sum;
   }, 0);
 
-  return predictionScore + stealDelta;
+  const lineupScore = lineupPicks
+    .filter((pick) => pick.username === username)
+    .reduce((sum, pick) => sum + (pick.points ?? 0), 0);
+
+  return predictionScore + stealDelta + lineupScore;
 }

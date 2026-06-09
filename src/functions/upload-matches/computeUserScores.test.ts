@@ -1,9 +1,8 @@
 import { describe, expect, it } from 'vitest';
+import type { LineupPickItem } from '@/shared/types/lineupPickItem';
 import type { PredictionItem } from '@/shared/types/predictionItem';
 import type { StealPickItem } from '@/shared/types/stealPickItem';
 import { computeUserScores } from './computeUserScores';
-
-const NOW = new Date('2026-06-06T12:00:00.000Z');
 
 function buildPrediction(username: string, pointsCommon: number): PredictionItem {
   return {
@@ -17,6 +16,18 @@ function buildPrediction(username: string, pointsCommon: number): PredictionItem
   };
 }
 
+function buildLineupPick(username: string, eventDay: string, points: number): LineupPickItem {
+  return {
+    eventDay,
+    username,
+    alias: username,
+    defensor: 'Def',
+    mediocampista: 'Mid',
+    delantero: 'Fwd',
+    points,
+  };
+}
+
 describe('computeUserScores', () => {
   it('computes score per user from stored pointsCommon', () => {
     const predictionsByUser = new Map([
@@ -24,7 +35,7 @@ describe('computeUserScores', () => {
       ['bob', [buildPrediction('bob', 1)]],
     ]);
 
-    expect(computeUserScores(predictionsByUser, [], NOW)).toEqual(
+    expect(computeUserScores(predictionsByUser, [], [])).toEqual(
       new Map([
         ['alice', 3],
         ['bob', 1],
@@ -47,7 +58,7 @@ describe('computeUserScores', () => {
       },
     ];
 
-    expect(computeUserScores(predictionsByUser, stealPicks, NOW)).toEqual(
+    expect(computeUserScores(predictionsByUser, stealPicks, [])).toEqual(
       new Map([
         ['alice', 5],
         ['bob', 1],
@@ -55,9 +66,27 @@ describe('computeUserScores', () => {
     );
   });
 
-  it('returns 0 for users with no predictions and no steal picks', () => {
+  it('adds lineup pick points per user', () => {
+    const predictionsByUser = new Map([
+      ['alice', [buildPrediction('alice', 3)]],
+      ['bob', [buildPrediction('bob', 1)]],
+    ]);
+    const lineupPicks = [
+      buildLineupPick('alice', '2026-06-05', 4),
+      buildLineupPick('bob', '2026-06-05', 2),
+    ];
+
+    expect(computeUserScores(predictionsByUser, [], lineupPicks)).toEqual(
+      new Map([
+        ['alice', 7],
+        ['bob', 3],
+      ]),
+    );
+  });
+
+  it('returns 0 for users with no predictions, steal picks or lineup picks', () => {
     const predictionsByUser = new Map([['alice', []]]);
 
-    expect(computeUserScores(predictionsByUser, [], NOW)).toEqual(new Map([['alice', 0]]));
+    expect(computeUserScores(predictionsByUser, [], [])).toEqual(new Map([['alice', 0]]));
   });
 });

@@ -25,18 +25,20 @@ describe('updateUsers', () => {
       const { updateUsers } = await import('./updateUsers');
 
       await updateUsers([
-        { username: 'alice', score: 10, rankingPosition: 1 },
-        { username: 'bob', score: 8, rankingPosition: 2 },
+        { username: 'alice', score: 10, rankingPosition: 1, rankingDif: 2 },
+        { username: 'bob', score: 8, rankingPosition: 2, rankingDif: -1 },
       ]);
 
       expect(updateItem).toHaveBeenCalledTimes(2);
       expect(updateItem).toHaveBeenCalledWith({
         tableName: 'Users',
         key: { username: 'alice' },
-        updateExpression: 'SET score = :score, rankingPosition = :rankingPosition',
+        updateExpression:
+          'SET score = :score, rankingPosition = :rankingPosition, rankingDif = :rankingDif',
         expressionAttributeValues: {
           ':score': 10,
           ':rankingPosition': 1,
+          ':rankingDif': 2,
         },
       });
     });

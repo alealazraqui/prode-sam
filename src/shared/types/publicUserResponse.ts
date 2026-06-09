@@ -4,4 +4,5 @@ export type PublicUserResponse = {
   alias: string;
   score: number;
   rankingPosition: number;
+  rankingDif: number;
 };

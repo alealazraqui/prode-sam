@@ -54,6 +54,7 @@ describe('update-current-user handler', () => {
         alias: 'Nuevo',
         score: 42,
         rankingPosition: 7,
+        rankingDif: 0,
       });
     });
   });
@@ -82,6 +83,7 @@ describe('update-current-user handler', () => {
         alias: 'Ale',
         score: 42,
         rankingPosition: 7,
+        rankingDif: 0,
       });
       expect(putItem).toHaveBeenCalledWith('Users', expect.objectContaining({ password: 'nueva' }));
     });
@@ -111,6 +113,7 @@ describe('update-current-user handler', () => {
         alias: 'Nuevo',
         score: 42,
         rankingPosition: 7,
+        rankingDif: 0,
       });
     });
   });
