@@ -97,7 +97,7 @@ const DELANTEROS = [
   'Julian Alvarez',
 ];
 
-const SAMPLE_POINTS = [12, 8, 5, 3, 0, 15, 7, null, 10, 4, 6] as const;
+const SAMPLE_POINTS = [6, 5, 4, 3, 2, 1, null, 6, 5, 4, 3] as const;
 
 function argentinaLocalToUtcIso(date: string, hour: number, minute = 0): string {
   const [year, month, day] = date.split('-').map(Number);

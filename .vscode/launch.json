@@ -164,6 +164,24 @@
     {
       "type": "node",
       "request": "launch",
+      "name": "Save lineup pick",
+      "program": "${workspaceFolder}/scripts/debug-invoke.ts",
+      "args": ["save-lineup-pick", "${input:save_lineup_pick_invocation}"],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "runtimeArgs": ["-r", "tsx/cjs/register"],
+      "envFile": "${workspaceFolder}/.env.local",
+      "env": {
+        "USERS_TABLE_NAME": "Users",
+        "MATCHES_TABLE_NAME": "Matches",
+        "LINEUP_PICKS_TABLE_NAME": "LineupPicks",
+        "AWS_PROFILE": "prode-dev"
+      },
+      "skipFiles": ["<node_internals>/**"]
+    },
+    {
+      "type": "node",
+      "request": "launch",
       "name": "Get event type",
       "program": "${workspaceFolder}/scripts/debug-invoke.ts",
       "args": ["get-event-type", "${input:get_event_type_invocation}"],
@@ -309,6 +327,16 @@
         { "label": "Sin contexto de authorizer", "value": "get-lineup-picks-unauthorized" }
       ],
       "default": "get-lineup-picks-success"
+    },
+    {
+      "id": "save_lineup_pick_invocation",
+      "type": "pickString",
+      "description": "Save lineup pick: invocacion a ejecutar",
+      "options": [
+        { "label": "Guardar pick futuro", "value": "save-lineup-pick-success" },
+        { "label": "Dia bloqueado (pasado)", "value": "save-lineup-pick-locked" }
+      ],
+      "default": "save-lineup-pick-success"
     },
     {
       "id": "get_event_type_invocation",

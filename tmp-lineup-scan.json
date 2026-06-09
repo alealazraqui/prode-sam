@@ -1,0 +1,171 @@
+﻿{
+    "Items": [
+        {
+            "alias": {
+                "S": "0 - Tanito Fury"
+            },
+            "mediocampista": {
+                "S": "Jude Bellingham"
+            },
+            "delantero": {
+                "S": "Lautaro MartÝnez"
+            },
+            "eventDay": {
+                "S": "2026-06-08"
+            },
+            "points": {
+                "N": "8"
+            },
+            "defensor": {
+                "S": "Cristian Romero"
+            },
+            "username": {
+                "S": "agustin.martinez"
+            }
+        },
+        {
+            "alias": {
+                "S": "SUPER NASTY VLADI"
+            },
+            "mediocampista": {
+                "S": "Kevin De Bruyne"
+            },
+            "delantero": {
+                "S": "Harry Kane"
+            },
+            "eventDay": {
+                "S": "2026-06-08"
+            },
+            "points": {
+                "N": "6"
+            },
+            "defensor": {
+                "S": "Declan Rice"
+            },
+            "username": {
+                "S": "alejandro.alazraqui"
+            }
+        },
+        {
+            "alias": {
+                "S": "A A A Hugo The Killer"
+            },
+            "mediocampista": {
+                "S": "Bruno Fernandes"
+            },
+            "delantero": {
+                "S": "Robert Lewandowski"
+            },
+            "eventDay": {
+                "S": "2026-06-08"
+            },
+            "points": {
+                "N": "3"
+            },
+            "defensor": {
+                "S": "R·ben Dias"
+            },
+            "username": {
+                "S": "bruno.munoz"
+            }
+        },
+        {
+            "alias": {
+                "S": "0 - EL TORERO ALMA EN RUEDO"
+            },
+            "mediocampista": {
+                "S": "Rodri"
+            },
+            "delantero": {
+                "S": "VinÝcius J·nior"
+            },
+            "eventDay": {
+                "S": "2026-06-08"
+            },
+            "points": {
+                "N": "12"
+            },
+            "defensor": {
+                "S": "Virgil van Dijk"
+            },
+            "username": {
+                "S": "daniel.golluscio"
+            }
+        },
+        {
+            "alias": {
+                "S": "DADO SUPREME"
+            },
+            "mediocampista": {
+                "S": "Enzo Fernßndez"
+            },
+            "delantero": {
+                "S": "Julian Alvarez"
+            },
+            "eventDay": {
+                "S": "2026-06-08"
+            },
+            "points": {
+                "N": "7"
+            },
+            "defensor": {
+                "S": "Theo Hernßndez"
+            },
+            "username": {
+                "S": "franco.dicarlo"
+            }
+        },
+        {
+            "alias": {
+                "S": "GORLAMI MAC MAGO"
+            },
+            "mediocampista": {
+                "S": "Vitinha"
+            },
+            "delantero": {
+                "S": "Erling Haaland"
+            },
+            "eventDay": {
+                "S": "2026-06-08"
+            },
+System.Management.Automation.RemoteException
+            "points": {
+                "NULL": true
+            },
+            "defensor": {
+                "S": "JoÒo Cancelo"
+            },
+            "username": {
+                "S": "julian.borgo"
+            }
+        },
+        {
+            "alias": {
+                "S": "BEBELOUI THREE CHILDS"
+            },
+            "mediocampista": {
+                "S": "Federico Valverde"
+            },
+            "delantero": {
+                "S": "Rafael LeÒo"
+            },
+            "eventDay": {
+                "S": "2026-06-08"
+            },
+            "points": {
+                "N": "15"
+            },
+            "defensor": {
+                "S": "Achraf Hakimi"
+            },
+            "username": {
+                "S": "marco.munoz"
+            }
+        },
+        {
+            "alias": {
+                "S": "nicosanlegal"
+            },
+            "mediocampista": {
+'charmap' codec can't encode character '\u0107' in position 11: character maps to <undefined>
+                "S": 

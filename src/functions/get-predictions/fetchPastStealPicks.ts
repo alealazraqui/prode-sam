@@ -11,7 +11,5 @@ export async function fetchPastStealPicks(): Promise<StealPickItem[]> {
 
   const matchById = new Map(matches.map((match) => [match.matchId, match]));
 
-  return stealPicks.filter(
-    (stealPick) => matchById.get(stealPick.matchId)?.status === 2,
-  );
+  return stealPicks.filter((stealPick) => matchById.get(stealPick.matchId)?.status === 2);
 }
