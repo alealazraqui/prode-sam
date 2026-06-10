@@ -287,4 +287,103 @@ describe('validateStealPick', () => {
       await expect(validateStealPick('stealer.user', REQUEST)).resolves.toBeUndefined();
     });
   });
+
+  it('throws when the chosen match is not in the stealer available list', async () => {
+    await withTestEnv(TEST_ENV, async () => {
+      vi.resetModules();
+      const { getItem } = await import('@/shared/dynamo/getItem');
+      const { validateStealPick } = await import('./validateStealPick');
+
+      vi.mocked(getItem).mockImplementation(async (tableName) => {
+        if (tableName === 'Stealers') {
+          return {
+            dayId: REQUEST.calendarDate,
+            stealerUsername: 'stealer.user',
+            availableMatchSteals: ['wc26-m020', 'wc26-m021'],
+          } satisfies StealerItem;
+        }
+
+        if (tableName === 'DayEvents') {
+          return {
+            date: REQUEST.calendarDate,
+            eventType: DayEventType.Robo,
+          } satisfies DayEventItem;
+        }
+
+        return null;
+      });
+
+      // REQUEST uses matchId 'wc26-m010' which is not in availableMatchSteals
+      await expect(validateStealPick('stealer.user', REQUEST)).rejects.toMatchObject({
+        statusCode: 400,
+        message: `Match ${REQUEST.matchId} is not available for this stealer`,
+      });
+    });
+  });
+
+  it('does not throw when the chosen match is within the stealer available list', async () => {
+    await withTestEnv(TEST_ENV, async () => {
+      vi.resetModules();
+      const { getItem } = await import('@/shared/dynamo/getItem');
+      const { validateStealPick } = await import('./validateStealPick');
+
+      vi.mocked(getItem).mockImplementation(async (tableName) => {
+        if (tableName === 'Stealers') {
+          return {
+            dayId: REQUEST.calendarDate,
+            stealerUsername: 'stealer.user',
+            availableMatchSteals: [REQUEST.matchId, 'wc26-m020'],
+          } satisfies StealerItem;
+        }
+
+        if (tableName === 'DayEvents') {
+          return {
+            date: REQUEST.calendarDate,
+            eventType: DayEventType.Robo,
+          } satisfies DayEventItem;
+        }
+
+        if (tableName === 'Matches') {
+          return FUTURE_MATCH;
+        }
+
+        return null;
+      });
+
+      await expect(validateStealPick('stealer.user', REQUEST)).resolves.toBeUndefined();
+    });
+  });
+
+  it('does not throw when the stealer row has no availableMatchSteals (backward compatibility)', async () => {
+    await withTestEnv(TEST_ENV, async () => {
+      vi.resetModules();
+      const { getItem } = await import('@/shared/dynamo/getItem');
+      const { validateStealPick } = await import('./validateStealPick');
+
+      vi.mocked(getItem).mockImplementation(async (tableName) => {
+        if (tableName === 'Stealers') {
+          // Legacy row without availableMatchSteals field
+          return {
+            dayId: REQUEST.calendarDate,
+            stealerUsername: 'stealer.user',
+          } satisfies StealerItem;
+        }
+
+        if (tableName === 'DayEvents') {
+          return {
+            date: REQUEST.calendarDate,
+            eventType: DayEventType.Robo,
+          } satisfies DayEventItem;
+        }
+
+        if (tableName === 'Matches') {
+          return FUTURE_MATCH;
+        }
+
+        return null;
+      });
+
+      await expect(validateStealPick('stealer.user', REQUEST)).resolves.toBeUndefined();
+    });
+  });
 });

@@ -97,6 +97,7 @@ describe('getEventType', () => {
         stealContext: {
           currentUserIsSteal: true,
           blockedUsernames: ['blocked-user', 'another-blocked'],
+          availableMatchIds: [],
         },
       });
       expect(getItem).toHaveBeenCalledWith('Stealers', {
@@ -128,11 +129,61 @@ describe('getEventType', () => {
       expect(result.stealContext).toEqual({
         currentUserIsSteal: false,
         blockedUsernames: [],
+        availableMatchIds: [],
       });
       expect(getItem).toHaveBeenCalledWith('Stealers', {
         dayId: '2026-06-07',
         stealerUsername: 'alejandro',
       });
+    });
+  });
+
+  it('includes the stealer available match IDs in steal context when the row has them', async () => {
+    await withTestEnv(TEST_ENV, async () => {
+      vi.resetModules();
+      const { getItem } = await import('@/shared/dynamo/getItem');
+      const { scanTable } = await import('@/shared/dynamo/scanTable');
+      const { getEventType } = await import('./getEventType');
+
+      vi.mocked(scanTable).mockImplementation(async (tableName: string) => {
+        if (tableName === 'DayEvents') {
+          return [{ date: '2026-06-07', eventType: DayEventType.Robo }] satisfies DayEventItem[];
+        }
+        return [] satisfies BlockedVictimItem[];
+      });
+      vi.mocked(getItem).mockResolvedValue({
+        dayId: '2026-06-07',
+        stealerUsername: 'alejandro',
+        availableMatchSteals: ['wc26-m001', 'wc26-m003'],
+      } satisfies StealerItem);
+
+      const result = await getEventType('alejandro');
+
+      expect(result.stealContext?.availableMatchIds).toEqual(['wc26-m001', 'wc26-m003']);
+    });
+  });
+
+  it('returns empty availableMatchIds when the stealer row has no availableMatchSteals', async () => {
+    await withTestEnv(TEST_ENV, async () => {
+      vi.resetModules();
+      const { getItem } = await import('@/shared/dynamo/getItem');
+      const { scanTable } = await import('@/shared/dynamo/scanTable');
+      const { getEventType } = await import('./getEventType');
+
+      vi.mocked(scanTable).mockImplementation(async (tableName: string) => {
+        if (tableName === 'DayEvents') {
+          return [{ date: '2026-06-07', eventType: DayEventType.Robo }] satisfies DayEventItem[];
+        }
+        return [] satisfies BlockedVictimItem[];
+      });
+      vi.mocked(getItem).mockResolvedValue({
+        dayId: '2026-06-07',
+        stealerUsername: 'alejandro',
+      } satisfies StealerItem);
+
+      const result = await getEventType('alejandro');
+
+      expect(result.stealContext?.availableMatchIds).toEqual([]);
     });
   });
 

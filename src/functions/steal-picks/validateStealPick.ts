@@ -26,6 +26,14 @@ export async function validateStealPick(
     throw new BadRequestError('Caller is not an authorized stealer for this day');
   }
 
+  if (
+    stealerRow.availableMatchSteals != null &&
+    stealerRow.availableMatchSteals.length > 0 &&
+    !stealerRow.availableMatchSteals.includes(request.matchId)
+  ) {
+    throw new BadRequestError(`Match ${request.matchId} is not available for this stealer`);
+  }
+
   const dayEvent = await getItem<DayEventItem>(environment.dayEventsTableName, {
     date: request.calendarDate,
   });

@@ -20,8 +20,10 @@ Buscar en internet los partidos del Mundial jugados el día `$EVENT_DAY` y sus g
 
 Para cada gol anotado, registrar:
 - Nombre completo del jugador
-- Posición real del jugador: **delantero**, **mediocampista** o **defensor**
+- Posición real del jugador: **delantero**, **mediocampista** o **defensor** (consultar en [Promiedos](https://www.promiedos.com.ar))
 - Partido en el que marcó
+
+**Excluir goles de penal**: los goles convertidos desde el punto de penal **no cuentan** para las sumatorias ni para la lista de goleadores del día.
 
 **Regla de deduplicación**: si un jugador marcó más de un gol en el día, contarlo **una sola vez**.
 Resultado: lista de jugadores que anotaron en el día (sin duplicados), con su posición.
@@ -200,3 +202,19 @@ Ejemplo de mensaje de cierre:
 
   Sin cambios (0 pts): usuario3, usuario4
 ```
+
+---
+
+## Paso 9 — Limpieza de archivos temporales
+
+Al finalizar con éxito (o si el usuario lo pide), **eliminar del repositorio** los archivos auxiliares creados durante la ejecución. No commitearlos.
+
+Archivos típicos de este executor:
+
+| Archivo | Cuándo se crea |
+|---------|----------------|
+| `tmp-lineup-filter.json` | Paso 3 — filtro DynamoDB por `eventDay` |
+| `update-lineup-points-event.json` | Paso 7 — evento HTTP para la Lambda |
+| `update-lineup-points-response.json` | Paso 7 — respuesta de la Lambda |
+
+Usar el Delete tool (o `Remove-Item` en PowerShell) sobre cada archivo listado que exista en `prode-sam/`.

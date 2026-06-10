@@ -35,6 +35,7 @@ export async function getEventType(username: string): Promise<EventTypeResponse>
     stealContext: {
       currentUserIsSteal: stealerRow != null,
       blockedUsernames: blockedVictims.map((item) => item.username),
+      availableMatchIds: stealerRow?.availableMatchSteals ?? [],
     },
   };
 }

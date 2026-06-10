@@ -152,3 +152,25 @@ Para cada `matchId`, mostrar en este orden:
 3. **StealPicks**: por cada ítem: `stealerUsername`, `victimUsername`, `matchId`, `stolenPoints` (y demás campos relevantes)
 
 Agrupar por `matchId`. Si alguna tabla no devuelve ítems para ese `matchId`, indicarlo explícitamente (ej: "Sin predictions para este partido").
+
+---
+
+## Paso 8 — Limpieza de archivos temporales
+
+Al finalizar con éxito (o si el usuario lo pide), **eliminar del repositorio** los archivos auxiliares creados durante la ejecución. No commitearlos.
+
+Archivos típicos de este executor:
+
+| Archivo | Cuándo se crea |
+|---------|----------------|
+| `tmp-key.json`, `tmp-key-*.json` | Paso 6.1 — keys DynamoDB por `matchId` |
+| `tmp-filter.json`, `tmp-filter-*.json` | Paso 6.2 / 6.3 — filtros DynamoDB por `matchId` |
+| `upload-matches-payload.json` | Paso 5 — payload enviado a la Lambda |
+| `upload-matches-response.json` | Paso 5 — respuesta de la Lambda |
+| `verify-*-match.json` | Paso 6.1 — si se redirige la salida de `get-item` a disco |
+| `verify-*-predictions.json` | Paso 6.2 — si se redirige la salida del scan a disco |
+| `verify-*-steals.json` | Paso 6.3 — si se redirige la salida del query a disco |
+
+> Los `verify-*.json` **no son parte del proyecto**: son volcados de verificación que puede generar el agente al ejecutar el Paso 6. Preferir presentar los resultados al usuario en el chat; si se guardan en disco para analizarlos, borrarlos en este paso.
+
+Usar el Delete tool (o `Remove-Item` en PowerShell) sobre cada archivo listado que exista en `prode-sam/`.

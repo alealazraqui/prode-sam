@@ -7,6 +7,7 @@ export type DayEventInfo = {
 export type StealContext = {
   currentUserIsSteal: boolean;
   blockedUsernames: string[];
+  availableMatchIds: string[];
 };
 
 export type EventTypeResponse = {

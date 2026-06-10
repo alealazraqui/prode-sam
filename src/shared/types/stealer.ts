@@ -2,6 +2,7 @@
 export type StealerItem = {
   dayId: string;
   stealerUsername: string;
+  availableMatchSteals?: string[];
   matchId?: string;
   victimUsername?: string;
 };

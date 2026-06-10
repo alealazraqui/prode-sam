@@ -376,6 +376,8 @@ Resources:
       Policies:
         - DynamoDBReadPolicy:
             TableName: !Ref LineupPicksTable
+        - DynamoDBReadPolicy:
+            TableName: !Ref MatchesTable
       Events:
         GetLineupPicksApi:
           Type: HttpApi

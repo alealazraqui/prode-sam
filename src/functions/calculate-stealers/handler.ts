@@ -1,3 +1,4 @@
+import { fetchMatchesForEventDay } from '@/functions/save-lineup-pick/fetchMatchesForEventDay';
 import { getDayType } from '@/shared/dynamo/getDayType';
 import { DayEventType } from '@/shared/types/dayEventType';
 import { clearBlockedVictims } from './clearBlockedVictims';
@@ -27,8 +28,12 @@ export async function handler(
   }
 
   await clearStealers(targetDayId);
-  const bottom3 = await fetchBottom3();
-  await insertStealers(targetDayId, bottom3);
+  const [bottom3, matchesForDay] = await Promise.all([
+    fetchBottom3(),
+    fetchMatchesForEventDay(targetDayId),
+  ]);
+  const matchIdsForDay = matchesForDay.map((m) => m.matchId);
+  await insertStealers(targetDayId, bottom3, matchIdsForDay);
   await clearBlockedVictims();
   const victims = await fetchLastStealVictims();
   await insertBlockedVictims(victims);
