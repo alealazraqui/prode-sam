@@ -1,12 +1,18 @@
 /**
- * Limpieza de datos mock en DynamoDB.
+ * Limpieza de datos mock en DynamoDB y reset de arranque.
  *
  * Elimina:
  *   1. Matches con matchId que empieza con "mock-"
- *   2. Predictions con matchId que empieza con "mock-" (solo mocks, no toca el resto)
+ *   2. Predictions con matchId que empieza con "mock-"
  *   3. TODOS los Stealers
  *   4. TODOS los BlockedVictims
  *   5. TODOS los StealPicks
+ *   6. TODOS los LineupPicks
+ *
+ * Resetea usuarios:
+ *   - score = 0
+ *   - rankingDif = 0
+ *   - rankingPosition = shuffle único del 1 al N
  *
  * Uso:
  *   $env:AWS_PROFILE = "prode-dev"
@@ -14,15 +20,24 @@
  */
 
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
-import { DeleteCommand, DynamoDBDocumentClient, ScanCommand } from '@aws-sdk/lib-dynamodb';
+import {
+  DeleteCommand,
+  DynamoDBDocumentClient,
+  ScanCommand,
+  UpdateCommand,
+} from '@aws-sdk/lib-dynamodb';
+import type { LineupPickItem } from '../src/shared/types/lineupPickItem';
+import type { UserItem } from '../src/shared/types/userItem';
 
 const client = DynamoDBDocumentClient.from(new DynamoDBClient({ region: 'us-east-1' }));
 
+const USERS_TABLE = process.env.USERS_TABLE_NAME ?? 'Users';
 const MATCHES_TABLE = process.env.MATCHES_TABLE_NAME ?? 'Matches';
 const PREDICTIONS_TABLE = process.env.PREDICTIONS_TABLE_NAME ?? 'Predictions';
 const STEALERS_TABLE = process.env.STEALERS_TABLE_NAME ?? 'Stealers';
 const STEAL_PICKS_TABLE = process.env.STEAL_PICKS_TABLE_NAME ?? 'StealPicks';
 const BLOCKED_VICTIMS_TABLE = process.env.BLOCKED_VICTIMS_TABLE_NAME ?? 'BlockedVictims';
+const LINEUP_PICKS_TABLE = process.env.LINEUP_PICKS_TABLE_NAME ?? 'LineupPicks';
 
 async function scanAll<T>(tableName: string): Promise<T[]> {
   const items: T[] = [];
@@ -118,8 +133,67 @@ async function deleteAllStealPicks(): Promise<number> {
   return all.length;
 }
 
+async function deleteAllLineupPicks(): Promise<number> {
+  const all = await scanAll<LineupPickItem>(LINEUP_PICKS_TABLE);
+
+  await Promise.all(
+    all.map((pick) =>
+      client.send(
+        new DeleteCommand({
+          TableName: LINEUP_PICKS_TABLE,
+          Key: { eventDay: pick.eventDay, username: pick.username },
+        }),
+      ),
+    ),
+  );
+
+  return all.length;
+}
+
+function assignUniqueRankingPositions(userCount: number): number[] {
+  const positions = Array.from({ length: userCount }, (_, index) => index + 1);
+  shuffle(positions);
+  return positions;
+}
+
+function shuffle(values: number[]): void {
+  for (let i = values.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [values[i], values[j]] = [values[j], values[i]];
+  }
+}
+
+async function resetUsers(): Promise<number> {
+  const users = await scanAll<UserItem>(USERS_TABLE);
+  const rankingPositions = assignUniqueRankingPositions(users.length);
+
+  await Promise.all(
+    users.map((user, index) =>
+      client.send(
+        new UpdateCommand({
+          TableName: USERS_TABLE,
+          Key: { username: user.username },
+          UpdateExpression:
+            'SET score = :score, rankingPosition = :rankingPosition, rankingDif = :rankingDif',
+          ExpressionAttributeValues: {
+            ':score': 0,
+            ':rankingPosition': rankingPositions[index],
+            ':rankingDif': 0,
+          },
+        }),
+      ),
+    ),
+  );
+
+  for (let i = 0; i < users.length; i += 1) {
+    console.log(`  ${users[i].username}: score=0, rankingPosition=${rankingPositions[i]}`);
+  }
+
+  return users.length;
+}
+
 async function main(): Promise<void> {
-  console.log('=== Limpieza de datos mock ===\n');
+  console.log('=== Limpieza de datos mock y reset de arranque ===\n');
 
   console.log('Eliminando mock matches...');
   const matches = await deleteMockMatches();
@@ -141,7 +215,15 @@ async function main(): Promise<void> {
   const stealPicks = await deleteAllStealPicks();
   console.log(`  ${stealPicks} steal pick(s) eliminados.`);
 
-  console.log('\nDone.');
+  console.log('Eliminando lineup picks...');
+  const lineupPicks = await deleteAllLineupPicks();
+  console.log(`  ${lineupPicks} lineup pick(s) eliminados.`);
+
+  console.log('\nReseteando usuarios (score=0, ranking aleatorio 1-N)...');
+  const users = await resetUsers();
+  console.log(`  ${users} usuario(s) actualizados.`);
+
+  console.log('\n=== Listo ===');
 }
 
 main().catch((err: unknown) => {

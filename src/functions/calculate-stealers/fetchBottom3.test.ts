@@ -61,7 +61,7 @@ describe('fetchBottom3', () => {
     });
   });
 
-  it('randomly picks one border user when the third place is tied', async () => {
+  it('includes all tied users when the third place is tied', async () => {
     await withTestEnv(TEST_ENV, async () => {
       vi.resetModules();
       const { scanTable } = await import('@/shared/dynamo/scanTable');
@@ -75,15 +75,7 @@ describe('fetchBottom3', () => {
         user('e', 10),
       ]);
 
-      const randomSpy = vi.spyOn(Math, 'random');
-
-      randomSpy.mockReturnValue(0);
-      await expect(fetchBottom3()).resolves.toEqual(['a', 'b', 'c']);
-
-      randomSpy.mockReturnValue(0.99);
-      await expect(fetchBottom3()).resolves.toEqual(['a', 'b', 'd']);
-
-      randomSpy.mockRestore();
+      await expect(fetchBottom3()).resolves.toEqual(['a', 'b', 'c', 'd']);
     });
   });
 

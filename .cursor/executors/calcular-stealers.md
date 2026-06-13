@@ -6,12 +6,18 @@ Después de la ejecución, mostrar el estado de las tablas `Stealers` y `Blocked
 
 ---
 
-## Paso 1 — Recibir el día del usuario
+## Paso 1 — Recibir parámetros del usuario
 
-El usuario indica el día en formato `YYYY-MM-DD` (ej: `2026-06-09`).
+El usuario indica:
 
-- Si el formato no es válido, informar al usuario y detener.
-- Guardar el valor como `$TARGET_DAY_ID`.
+| Parámetro | Requerido | Descripción |
+|---|---|---|
+| `targetDayId` | Sí | Día en formato `YYYY-MM-DD` (ej: `2026-06-09`) |
+| `stealsCount` | No | Cantidad de partidos que se asignan a cada stealer. Si se omite, se usa `ceil(N/2)` donde N es la cantidad de partidos elegibles del día. |
+| `excludedMatchIds` | No | Lista de IDs de partidos que **no** deben ser elegibles para robo (ej: partidos a horario inconveniente). Si se omite, se usan todos los partidos del día. |
+
+- Si el formato de `targetDayId` no es válido, informar al usuario y detener.
+- Guardar los valores como `$TARGET_DAY_ID`, `$STEALS_COUNT` (puede ser vacío) y `$EXCLUDED_MATCH_IDS` (puede ser `[]`).
 
 ---
 
@@ -32,13 +38,25 @@ Guardar el valor devuelto como `$FUNCTION_NAME`.
 
 ## Paso 3 — Invocar la Lambda
 
-1. Escribir el payload al archivo `calculate-stealers-payload.json` (usar el Write tool):
+1. Escribir el payload al archivo `calculate-stealers-payload.json` (usar el Write tool).
 
-```json
-{
-  "targetDayId": "<TARGET_DAY_ID>"
-}
-```
+   Incluir solo los campos provistos por el usuario. Ejemplos:
+
+   Solo día (comportamiento por defecto):
+   ```json
+   {
+     "targetDayId": "<TARGET_DAY_ID>"
+   }
+   ```
+
+   Con cantidad de robos y partidos excluidos:
+   ```json
+   {
+     "targetDayId": "<TARGET_DAY_ID>",
+     "stealsCount": <STEALS_COUNT>,
+     "excludedMatchIds": ["<MATCH_ID_1>", "<MATCH_ID_2>"]
+   }
+   ```
 
 2. Invocar:
 

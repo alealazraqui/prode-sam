@@ -1,3 +1,5 @@
 {
-  "targetDayId": "2026-06-09"
+  "targetDayId": "2026-06-09",
+  "stealsCount": 3,
+  "excludedMatchIds": ["wc26-m042"]
 }

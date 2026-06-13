@@ -83,8 +83,8 @@ describe('sampleHalfMatchIds', () => {
       vi.spyOn(Math, 'random').mockReturnValue(0);
       const resultA = sampleHalfMatchIds(ids);
 
-      // Force Math.random to always return 1 → sort comparator always positive → reversed order
-      vi.spyOn(Math, 'random').mockReturnValue(1);
+      // Force Math.random to always return 0.99 → Fisher-Yates picks last valid index
+      vi.spyOn(Math, 'random').mockReturnValue(0.99);
       const resultB = sampleHalfMatchIds(ids);
 
       // Both are valid subsets of length 2

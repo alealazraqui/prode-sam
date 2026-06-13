@@ -32,8 +32,11 @@ export async function handler(
     fetchBottom3(),
     fetchMatchesForEventDay(targetDayId),
   ]);
-  const matchIdsForDay = matchesForDay.map((m) => m.matchId);
-  await insertStealers(targetDayId, bottom3, matchIdsForDay);
+  const excludedMatchIds = event.excludedMatchIds ?? [];
+  const eligibleMatchIds = matchesForDay
+    .map((m) => m.matchId)
+    .filter((id) => !excludedMatchIds.includes(id));
+  await insertStealers(targetDayId, bottom3, eligibleMatchIds, event.stealsCount);
   await clearBlockedVictims();
   const victims = await fetchLastStealVictims();
   await insertBlockedVictims(victims);

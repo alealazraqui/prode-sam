@@ -6,14 +6,15 @@ import { sampleHalfMatchIds } from './sampleHalfMatchIds';
 export async function insertStealers(
   targetDayId: string,
   stealerUsernames: string[],
-  allMatchIds: string[],
+  eligibleMatchIds: string[],
+  stealsCount?: number,
 ): Promise<void> {
   await Promise.all(
     stealerUsernames.map((stealerUsername) =>
       putItem<StealerItem>(environment.stealersTableName, {
         dayId: targetDayId,
         stealerUsername,
-        availableMatchSteals: sampleHalfMatchIds(allMatchIds),
+        availableMatchSteals: sampleHalfMatchIds(eligibleMatchIds, stealsCount),
       }),
     ),
   );
