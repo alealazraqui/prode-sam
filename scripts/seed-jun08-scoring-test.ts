@@ -205,9 +205,7 @@ async function updateLineupPicks(picks: LineupPickItem[]): Promise<void> {
       }),
     );
 
-    console.log(
-      `  ✓ ${pick.alias}: ${defensor} / ${mediocampista} / ${delantero} → null pts`,
-    );
+    console.log(`  ✓ ${pick.alias}: ${defensor} / ${mediocampista} / ${delantero} → null pts`);
   }
 
   console.log(`\n${sorted.length} lineup pick(s) actualizado(s).`);

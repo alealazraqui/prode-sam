@@ -21,7 +21,7 @@ function mapItemsToResponses(items: PredictionItem[], aliasByUsername: Map<strin
 }
 
 export async function getPredictions(authUsername: string): Promise<GetPredictionsResponse> {
-  const [myItems, othersItems, users, myStealPick, allStealPicks] = await Promise.all([
+  const [myItems, othersItems, users, myStealPick, stealPicksContext] = await Promise.all([
     fetchMyPredictions(authUsername),
     fetchOthersPredictions(authUsername),
     scanTable<UserItem>(environment.usersTableName),
@@ -37,6 +37,7 @@ export async function getPredictions(authUsername: string): Promise<GetPredictio
     myPredictions,
     allPredictions: [...myPredictions, ...othersPredictions],
     myStealPick,
-    allStealPicks,
+    allStealPicks: stealPicksContext.pastStealPicks,
+    activeStealMatchIds: stealPicksContext.activeStealMatchIds,
   };
 }

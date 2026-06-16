@@ -523,6 +523,8 @@ Resources:
             TableName: !Ref UsersTable
         - DynamoDBReadPolicy:
             TableName: !Ref DayEventsTable
+        - DynamoDBReadPolicy:
+            TableName: !Ref MatchesTable
     Metadata:
       BuildMethod: esbuild
       BuildProperties:

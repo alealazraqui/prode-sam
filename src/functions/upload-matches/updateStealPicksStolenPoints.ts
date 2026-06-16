@@ -8,7 +8,9 @@ import type { PredictionItem } from '@/shared/types/predictionItem';
 import type { StealPickItem } from '@/shared/types/stealPickItem';
 import type { UploadMatchInput } from './types';
 
-async function resolveRoboMatchIds(persistedMatches: ReadonlyArray<UploadMatchInput>): Promise<Set<string>> {
+async function resolveRoboMatchIds(
+  persistedMatches: ReadonlyArray<UploadMatchInput>,
+): Promise<Set<string>> {
   const matchIdsByCalendarDate = new Map<string, Set<string>>();
 
   for (const match of persistedMatches) {

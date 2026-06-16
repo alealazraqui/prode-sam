@@ -25,10 +25,10 @@ export async function updateLineupPickPoints(input: UpdateLineupPickPointsInput)
 
   function isConditionalCheckFailed(error: unknown): boolean {
     return (
-        typeof error === 'object' &&
-        error !== null &&
-        'name' in error &&
-        error.name === 'ConditionalCheckFailedException'
-      );
-    }
+      typeof error === 'object' &&
+      error !== null &&
+      'name' in error &&
+      error.name === 'ConditionalCheckFailedException'
+    );
   }
+}

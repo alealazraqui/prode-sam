@@ -120,7 +120,9 @@ async function main(): Promise<void> {
   await seedMatches();
 
   console.log('\n=== Listo ===');
-  console.log(`Día ${EVENT_DAY} configurado como jugadores con ESP-FRA y ARG-BRA a las 15:00 (Argentina).`);
+  console.log(
+    `Día ${EVENT_DAY} configurado como jugadores con ESP-FRA y ARG-BRA a las 15:00 (Argentina).`,
+  );
 }
 
 main().catch((err: unknown) => {

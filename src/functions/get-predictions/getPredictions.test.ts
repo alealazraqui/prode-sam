@@ -84,7 +84,10 @@ describe('getPredictions', () => {
       vi.mocked(fetchMyPredictions).mockResolvedValue([ownFutureKickoff, ownPastKickoff]);
       vi.mocked(fetchOthersPredictions).mockResolvedValue([]);
       vi.mocked(fetchMyStealPick).mockResolvedValue(null);
-      vi.mocked(fetchPastStealPicks).mockResolvedValue([]);
+      vi.mocked(fetchPastStealPicks).mockResolvedValue({
+        pastStealPicks: [],
+        activeStealMatchIds: [],
+      });
       vi.mocked(scanTable).mockResolvedValue(mockUsers);
 
       const { getPredictions } = await import('./getPredictions');
@@ -126,7 +129,10 @@ describe('getPredictions', () => {
       vi.mocked(fetchMyPredictions).mockResolvedValue([ownPastKickoff]);
       vi.mocked(fetchOthersPredictions).mockResolvedValue([]);
       vi.mocked(fetchMyStealPick).mockResolvedValue(null);
-      vi.mocked(fetchPastStealPicks).mockResolvedValue([]);
+      vi.mocked(fetchPastStealPicks).mockResolvedValue({
+        pastStealPicks: [],
+        activeStealMatchIds: [],
+      });
       vi.mocked(scanTable).mockResolvedValue(mockUsers);
 
       const { getPredictions } = await import('./getPredictions');
@@ -157,7 +163,10 @@ describe('getPredictions', () => {
       vi.mocked(fetchMyPredictions).mockResolvedValue([ownPastKickoff]);
       vi.mocked(fetchOthersPredictions).mockResolvedValue([otherPastKickoff]);
       vi.mocked(fetchMyStealPick).mockResolvedValue(null);
-      vi.mocked(fetchPastStealPicks).mockResolvedValue([]);
+      vi.mocked(fetchPastStealPicks).mockResolvedValue({
+        pastStealPicks: [],
+        activeStealMatchIds: [],
+      });
       vi.mocked(scanTable).mockResolvedValue(mockUsers);
 
       const { getPredictions } = await import('./getPredictions');
@@ -197,7 +206,10 @@ describe('getPredictions', () => {
       vi.mocked(fetchMyPredictions).mockResolvedValue([]);
       vi.mocked(fetchOthersPredictions).mockResolvedValue([ownPastKickoff, otherWithoutPoints]);
       vi.mocked(fetchMyStealPick).mockResolvedValue(null);
-      vi.mocked(fetchPastStealPicks).mockResolvedValue([]);
+      vi.mocked(fetchPastStealPicks).mockResolvedValue({
+        pastStealPicks: [],
+        activeStealMatchIds: [],
+      });
       vi.mocked(scanTable).mockResolvedValue(mockUsers);
 
       const { getPredictions } = await import('./getPredictions');
@@ -255,7 +267,10 @@ describe('getPredictions', () => {
       vi.mocked(fetchMyPredictions).mockResolvedValue([]);
       vi.mocked(fetchOthersPredictions).mockResolvedValue([]);
       vi.mocked(fetchMyStealPick).mockResolvedValue(myStealPick);
-      vi.mocked(fetchPastStealPicks).mockResolvedValue(allStealPicks);
+      vi.mocked(fetchPastStealPicks).mockResolvedValue({
+        pastStealPicks: allStealPicks,
+        activeStealMatchIds: [],
+      });
       vi.mocked(scanTable).mockResolvedValue(mockUsers);
 
       const { getPredictions } = await import('./getPredictions');
@@ -263,6 +278,7 @@ describe('getPredictions', () => {
 
       expect(result.myStealPick).toEqual(myStealPick);
       expect(result.allStealPicks).toEqual(allStealPicks);
+      expect(result.activeStealMatchIds).toEqual([]);
     });
   });
 });

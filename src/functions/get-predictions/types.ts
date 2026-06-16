@@ -15,4 +15,5 @@ export type GetPredictionsResponse = {
   allPredictions: PredictionResponse[];
   myStealPick: StealPickItem | null;
   allStealPicks: StealPickItem[];
+  activeStealMatchIds: string[];
 };

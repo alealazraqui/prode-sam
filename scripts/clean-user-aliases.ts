@@ -105,9 +105,7 @@ async function main(): Promise<void> {
     );
   }
 
-  console.log(
-    `\n=== Listo: ${userUpdates.length + pickUpdates.length} update(s) aplicado(s) ===`,
-  );
+  console.log(`\n=== Listo: ${userUpdates.length + pickUpdates.length} update(s) aplicado(s) ===`);
 }
 
 main().catch((err: unknown) => {

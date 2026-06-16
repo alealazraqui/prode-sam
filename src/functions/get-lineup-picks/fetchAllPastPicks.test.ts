@@ -84,9 +84,8 @@ describe('fetchAllPastPicks', () => {
     await withTestEnv(TEST_ENV, async () => {
       vi.resetModules();
       const { scanTable } = await import('@/shared/dynamo/scanTable');
-      const { fetchMatchesForEventDay } = await import(
-        '@/functions/save-lineup-pick/fetchMatchesForEventDay'
-      );
+      const { fetchMatchesForEventDay } =
+        await import('@/functions/save-lineup-pick/fetchMatchesForEventDay');
       vi.mocked(scanTable).mockResolvedValue([
         pastPickUser1,
         pastPickUser2,
@@ -107,9 +106,8 @@ describe('fetchAllPastPicks', () => {
     await withTestEnv(TEST_ENV, async () => {
       vi.resetModules();
       const { scanTable } = await import('@/shared/dynamo/scanTable');
-      const { fetchMatchesForEventDay } = await import(
-        '@/functions/save-lineup-pick/fetchMatchesForEventDay'
-      );
+      const { fetchMatchesForEventDay } =
+        await import('@/functions/save-lineup-pick/fetchMatchesForEventDay');
       vi.mocked(scanTable).mockResolvedValue([
         pastPickUser1,
         pastPickUser2,
@@ -129,9 +127,8 @@ describe('fetchAllPastPicks', () => {
     await withTestEnv(TEST_ENV, async () => {
       vi.resetModules();
       const { scanTable } = await import('@/shared/dynamo/scanTable');
-      const { fetchMatchesForEventDay } = await import(
-        '@/functions/save-lineup-pick/fetchMatchesForEventDay'
-      );
+      const { fetchMatchesForEventDay } =
+        await import('@/functions/save-lineup-pick/fetchMatchesForEventDay');
       vi.mocked(scanTable).mockResolvedValue([todayPickUser1, futurePickUser2]);
       vi.mocked(fetchMatchesForEventDay).mockResolvedValue([]);
 
@@ -146,9 +143,8 @@ describe('fetchAllPastPicks', () => {
     await withTestEnv(TEST_ENV, async () => {
       vi.resetModules();
       const { scanTable } = await import('@/shared/dynamo/scanTable');
-      const { fetchMatchesForEventDay } = await import(
-        '@/functions/save-lineup-pick/fetchMatchesForEventDay'
-      );
+      const { fetchMatchesForEventDay } =
+        await import('@/functions/save-lineup-pick/fetchMatchesForEventDay');
       vi.mocked(scanTable).mockResolvedValue([futurePickUser2]);
       vi.mocked(fetchMatchesForEventDay).mockResolvedValue([]);
 

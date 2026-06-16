@@ -132,7 +132,7 @@ describe('calculate-stealers handler', () => {
     });
   });
 
-  it('leaves blocked victims empty when there is no successful steal history', async () => {
+  it('rebuilds blocked victims from the latest steal day even when stolen points are still zero', async () => {
     await withTestEnv(TEST_ENV, async () => {
       vi.resetModules();
       const { getDayType } = await import('@/shared/dynamo/getDayType');
@@ -155,8 +155,15 @@ describe('calculate-stealers handler', () => {
             {
               calendarDate: '2026-06-04',
               stealerUsername: 's1',
-              victimUsername: 'ignored',
+              victimUsername: 'old-victim',
               matchId: 'm1',
+              stolenPoints: 4,
+            },
+            {
+              calendarDate: '2026-06-07',
+              stealerUsername: 's2',
+              victimUsername: 'pending-victim',
+              matchId: 'm2',
               stolenPoints: 0,
             },
           ];
@@ -164,11 +171,11 @@ describe('calculate-stealers handler', () => {
         return [];
       });
 
-      const response = await handler({ targetDayId: '2026-06-07' });
+      const response = await handler({ targetDayId: '2026-06-08' });
       const body = JSON.parse(response.body);
 
-      expect(body.blockedVictims).toEqual([]);
-      expect(putItem).not.toHaveBeenCalledWith('BlockedVictims', expect.anything());
+      expect(body.blockedVictims).toEqual(['pending-victim']);
+      expect(putItem).toHaveBeenCalledWith('BlockedVictims', { username: 'pending-victim' });
     });
   });
 
@@ -184,12 +191,67 @@ describe('calculate-stealers handler', () => {
 
       // 4 matches on 2026-06-07 Argentina time → each stealer gets ceil(4/2) = 2
       const matchesForDay = [
-        { matchId: 'wc26-m001', kickoffAt: '2026-06-07T18:00:00.000Z', status: 1, isFirstRound: true, homeTeamName: 'A', homeTeamCode: null, awayTeamName: 'B', awayTeamCode: null, homeGoals: null, awayGoals: null },
-        { matchId: 'wc26-m002', kickoffAt: '2026-06-07T19:00:00.000Z', status: 1, isFirstRound: true, homeTeamName: 'C', homeTeamCode: null, awayTeamName: 'D', awayTeamCode: null, homeGoals: null, awayGoals: null },
-        { matchId: 'wc26-m003', kickoffAt: '2026-06-07T21:00:00.000Z', status: 1, isFirstRound: true, homeTeamName: 'E', homeTeamCode: null, awayTeamName: 'F', awayTeamCode: null, homeGoals: null, awayGoals: null },
-        { matchId: 'wc26-m004', kickoffAt: '2026-06-07T23:00:00.000Z', status: 1, isFirstRound: true, homeTeamName: 'G', homeTeamCode: null, awayTeamName: 'H', awayTeamCode: null, homeGoals: null, awayGoals: null },
+        {
+          matchId: 'wc26-m001',
+          kickoffAt: '2026-06-07T18:00:00.000Z',
+          status: 1,
+          isFirstRound: true,
+          homeTeamName: 'A',
+          homeTeamCode: null,
+          awayTeamName: 'B',
+          awayTeamCode: null,
+          homeGoals: null,
+          awayGoals: null,
+        },
+        {
+          matchId: 'wc26-m002',
+          kickoffAt: '2026-06-07T19:00:00.000Z',
+          status: 1,
+          isFirstRound: true,
+          homeTeamName: 'C',
+          homeTeamCode: null,
+          awayTeamName: 'D',
+          awayTeamCode: null,
+          homeGoals: null,
+          awayGoals: null,
+        },
+        {
+          matchId: 'wc26-m003',
+          kickoffAt: '2026-06-07T21:00:00.000Z',
+          status: 1,
+          isFirstRound: true,
+          homeTeamName: 'E',
+          homeTeamCode: null,
+          awayTeamName: 'F',
+          awayTeamCode: null,
+          homeGoals: null,
+          awayGoals: null,
+        },
+        {
+          matchId: 'wc26-m004',
+          kickoffAt: '2026-06-07T23:00:00.000Z',
+          status: 1,
+          isFirstRound: true,
+          homeTeamName: 'G',
+          homeTeamCode: null,
+          awayTeamName: 'H',
+          awayTeamCode: null,
+          homeGoals: null,
+          awayGoals: null,
+        },
         // This match belongs to the next day in Argentina → must NOT be included
-        { matchId: 'wc26-m005', kickoffAt: '2026-06-08T09:00:00.000Z', status: 1, isFirstRound: true, homeTeamName: 'I', homeTeamCode: null, awayTeamName: 'J', awayTeamCode: null, homeGoals: null, awayGoals: null },
+        {
+          matchId: 'wc26-m005',
+          kickoffAt: '2026-06-08T09:00:00.000Z',
+          status: 1,
+          isFirstRound: true,
+          homeTeamName: 'I',
+          homeTeamCode: null,
+          awayTeamName: 'J',
+          awayTeamCode: null,
+          homeGoals: null,
+          awayGoals: null,
+        },
       ];
 
       vi.mocked(scanTable).mockImplementation(async (tableName: string) => {
@@ -211,9 +273,7 @@ describe('calculate-stealers handler', () => {
 
       const validMatchIds = ['wc26-m001', 'wc26-m002', 'wc26-m003', 'wc26-m004'];
 
-      const stealerCalls = vi
-        .mocked(putItem)
-        .mock.calls.filter(([table]) => table === 'Stealers');
+      const stealerCalls = vi.mocked(putItem).mock.calls.filter(([table]) => table === 'Stealers');
 
       expect(stealerCalls).toHaveLength(3);
 

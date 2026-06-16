@@ -52,6 +52,7 @@ describe('get-predictions handler', () => {
           stolenPoints: 0,
         },
         allStealPicks: [],
+        activeStealMatchIds: [],
       });
 
       const { handler } = await import('./handler');
@@ -95,6 +96,7 @@ describe('get-predictions handler', () => {
           stolenPoints: 0,
         },
         allStealPicks: [],
+        activeStealMatchIds: [],
       });
       expect(getPredictions).toHaveBeenCalledWith('user1');
     });

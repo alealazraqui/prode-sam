@@ -115,9 +115,7 @@ describe('updateStealPicksStolenPoints', () => {
       vi.mocked(putItem).mockReset();
 
       const { updateStealPicksStolenPoints } = await import('./updateStealPicksStolenPoints');
-      await updateStealPicksStolenPoints([
-        { ...UPLOADED_MATCH, matchId: 'mock-today-18h' },
-      ]);
+      await updateStealPicksStolenPoints([{ ...UPLOADED_MATCH, matchId: 'mock-today-18h' }]);
 
       expect(putItem).not.toHaveBeenCalled();
     });
