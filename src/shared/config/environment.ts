@@ -17,5 +17,8 @@ export const environment = {
   blockedVictimsTableName: getRequiredEnv('BLOCKED_VICTIMS_TABLE_NAME'),
   stealPicksTableName: getRequiredEnv('STEAL_PICKS_TABLE_NAME'),
   lineupPicksTableName: getRequiredEnv('LINEUP_PICKS_TABLE_NAME'),
+  alterAssignmentsTableName: getRequiredEnv('ALTER_ASSIGNMENTS_TABLE_NAME'),
+  alterPicksTableName: getRequiredEnv('ALTER_PICKS_TABLE_NAME'),
+  alterVictimLocksTableName: getRequiredEnv('ALTER_VICTIM_LOCKS_TABLE_NAME'),
   jwtSecret: getRequiredEnv('JWT_SECRET'),
 };

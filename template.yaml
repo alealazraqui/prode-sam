@@ -24,6 +24,9 @@ Globals:
         BLOCKED_VICTIMS_TABLE_NAME: !Ref BlockedVictimsTable
         STEAL_PICKS_TABLE_NAME: !Ref StealPicksTable
         LINEUP_PICKS_TABLE_NAME: !Ref LineupPicksTable
+        ALTER_ASSIGNMENTS_TABLE_NAME: !Ref AlterAssignmentsTable
+        ALTER_PICKS_TABLE_NAME: !Ref AlterPicksTable
+        ALTER_VICTIM_LOCKS_TABLE_NAME: !Ref AlterVictimLocksTable
         JWT_SECRET: !Ref JwtSecret
 
 Resources:
@@ -191,6 +194,52 @@ Resources:
           KeyType: HASH
         - AttributeName: username
           KeyType: RANGE
+
+  AlterAssignmentsTable:
+    Type: AWS::DynamoDB::Table
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Delete
+    Properties:
+      TableName: AlterAssignments
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: calendarDate
+          AttributeType: S
+        - AttributeName: username
+          AttributeType: S
+      KeySchema:
+        - AttributeName: calendarDate
+          KeyType: HASH
+        - AttributeName: username
+          KeyType: RANGE
+
+  AlterPicksTable:
+    Type: AWS::DynamoDB::Table
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Delete
+    Properties:
+      TableName: AlterPicks
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: altererUsername
+          AttributeType: S
+      KeySchema:
+        - AttributeName: altererUsername
+          KeyType: HASH
+
+  AlterVictimLocksTable:
+    Type: AWS::DynamoDB::Table
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Delete
+    Properties:
+      TableName: AlterVictimLocks
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: victimUsername
+          AttributeType: S
+      KeySchema:
+        - AttributeName: victimUsername
+          KeyType: HASH
 
   JwtAuthorizerFunction:
     Type: AWS::Serverless::Function
@@ -641,6 +690,21 @@ Outputs:
     Value: !Ref LineupPicksTable
     Export:
       Name: !Sub '${AWS::StackName}-LineupPicksTableName'
+  AlterAssignmentsTableName:
+    Description: DynamoDB AlterAssignments table name (for seed scripts and Lambdas)
+    Value: !Ref AlterAssignmentsTable
+    Export:
+      Name: !Sub '${AWS::StackName}-AlterAssignmentsTableName'
+  AlterPicksTableName:
+    Description: DynamoDB AlterPicks table name (for seed scripts and Lambdas)
+    Value: !Ref AlterPicksTable
+    Export:
+      Name: !Sub '${AWS::StackName}-AlterPicksTableName'
+  AlterVictimLocksTableName:
+    Description: DynamoDB AlterVictimLocks table name (for seed scripts and Lambdas)
+    Value: !Ref AlterVictimLocksTable
+    Export:
+      Name: !Sub '${AWS::StackName}-AlterVictimLocksTableName'
   HttpApiUrl:
     Description: HTTP API base URL
     Value: !Sub 'https://${ProdeHttpApi}.execute-api.${AWS::Region}.amazonaws.com'

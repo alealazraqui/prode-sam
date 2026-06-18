@@ -64,6 +64,7 @@ describe('get-event-type handler', () => {
         stealContext: {
           currentUserIsSteal: true,
           blockedUsernames: ['blocked-user'],
+          availableMatchIds: ['match-1'],
         },
       };
       vi.mocked(getEventType).mockResolvedValue(eventTypeResponse);
