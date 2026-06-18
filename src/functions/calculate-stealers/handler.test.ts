@@ -132,7 +132,7 @@ describe('calculate-stealers handler', () => {
     });
   });
 
-  it('rebuilds blocked victims from the latest steal day even when stolen points are still zero', async () => {
+  it('rebuilds blocked victims only when the latest steal day has stolen points', async () => {
     await withTestEnv(TEST_ENV, async () => {
       vi.resetModules();
       const { getDayType } = await import('@/shared/dynamo/getDayType');
@@ -162,9 +162,16 @@ describe('calculate-stealers handler', () => {
             {
               calendarDate: '2026-06-07',
               stealerUsername: 's2',
-              victimUsername: 'pending-victim',
+              victimUsername: 'no-points-victim',
               matchId: 'm2',
               stolenPoints: 0,
+            },
+            {
+              calendarDate: '2026-06-07',
+              stealerUsername: 's3',
+              victimUsername: 'robbed-victim',
+              matchId: 'm3',
+              stolenPoints: 2,
             },
           ];
         }
@@ -174,8 +181,9 @@ describe('calculate-stealers handler', () => {
       const response = await handler({ targetDayId: '2026-06-08' });
       const body = JSON.parse(response.body);
 
-      expect(body.blockedVictims).toEqual(['pending-victim']);
-      expect(putItem).toHaveBeenCalledWith('BlockedVictims', { username: 'pending-victim' });
+      expect(body.blockedVictims).toEqual(['robbed-victim']);
+      expect(putItem).toHaveBeenCalledWith('BlockedVictims', { username: 'robbed-victim' });
+      expect(putItem).not.toHaveBeenCalledWith('BlockedVictims', { username: 'no-points-victim' });
     });
   });
 
