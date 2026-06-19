@@ -1,5 +1,1 @@
-const ARGENTINA_TIME_ZONE = 'America/Argentina/Buenos_Aires';
-
-export function getArgentinaTodayDateString(now: Date = new Date()): string {
-  return now.toLocaleDateString('en-CA', { timeZone: ARGENTINA_TIME_ZONE });
-}
+export { getArgentinaTodayDateString } from '@/shared/dates/argentinaDate';

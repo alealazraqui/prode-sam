@@ -8,6 +8,7 @@ export type AlterDelta = 1 | -1;
 export type AlterAssignmentItem = {
   calendarDate: string;
   username: string;
+  createdAt: string;
 };
 
 /** Shape of a row in the AlterPicks DynamoDB table. */

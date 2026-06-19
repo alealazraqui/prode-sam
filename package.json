@@ -10,6 +10,7 @@
     "seed:matches": "tsx scripts/seed-matches/seed-matches.ts",
     "seed:predictions": "tsx scripts/seed-predictions/seed-predictions.ts",
     "seed:day-events": "tsx scripts/seed-day-events/seed-day-events.ts",
+    "seed:alter-assignments": "tsx scripts/seed-alter-assignments/seed-alter-assignments.ts",
     "test": "vitest run",
     "test:watch": "vitest",
     "format": "prettier --write \"src/**/*.ts\" \"scripts/**/*.ts\"",
