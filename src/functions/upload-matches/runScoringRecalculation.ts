@@ -1,8 +1,5 @@
 import { environment } from '@/shared/config/environment';
-import { putItem } from '@/shared/dynamo/putItem';
 import { scanTable } from '@/shared/dynamo/scanTable';
-import { scoreCalculator } from '@/shared/scoring/scoreCalculator';
-import type { ScoringMatchInput } from '@/shared/scoring/types';
 import type { LineupPickItem } from '@/shared/types/lineupPickItem';
 import type { PredictionItem } from '@/shared/types/predictionItem';
 import type { StealPickItem } from '@/shared/types/stealPickItem';
@@ -12,6 +9,7 @@ import { computeRanking } from './computeRanking';
 import { computeUserScores } from './computeUserScores';
 import { saveMatches } from './saveMatches';
 import type { UploadMatchInput } from './types';
+import { updatePredictionPoints } from './updatePredictionPoints';
 import { updateStealPicksStolenPoints } from './updateStealPicksStolenPoints';
 import { updateUsers } from './updateUsers';
 
@@ -28,29 +26,6 @@ export async function runScoringRecalculation(matches: UploadMatchInput[]): Prom
 
   // Step 4: recompute scores for all users from scratch
   await recalculateUserScores();
-}
-
-async function updatePredictionPoints(persistedMatches: UploadMatchInput[]): Promise<void> {
-  if (persistedMatches.length === 0) return;
-
-  const matchLookup = new Map<string, ScoringMatchInput>(
-    persistedMatches.map((m) => [
-      m.matchId,
-      { status: 2, homeGoals: m.homeGoals, awayGoals: m.awayGoals },
-    ]),
-  );
-
-  const allPredictions = await scanTable<PredictionItem>(environment.predictionsTableName);
-
-  await Promise.all(
-    allPredictions
-      .filter((p) => matchLookup.has(p.matchId))
-      .map(async (prediction) => {
-        const match = matchLookup.get(prediction.matchId)!;
-        const pointsCommon = scoreCalculator(prediction, match).pointsCommon;
-        await putItem(environment.predictionsTableName, { ...prediction, pointsCommon });
-      }),
-  );
 }
 
 async function recalculateUserScores(): Promise<void> {
