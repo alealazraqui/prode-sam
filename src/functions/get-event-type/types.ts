@@ -10,8 +10,14 @@ export type StealContext = {
   availableMatchIds: string[];
 };
 
+export type AlterContext = {
+  currentUserCanAlter: boolean;
+  blockedUsernames: string[];
+};
+
 export type EventTypeResponse = {
   today: string;
   days: Record<string, DayEventInfo>;
   stealContext?: StealContext;
+  alterContext?: AlterContext;
 };

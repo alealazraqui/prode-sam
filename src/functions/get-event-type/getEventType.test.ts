@@ -2,6 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { withTestEnv } from '@/shared/test/withTestEnv';
 import type { DayEventItem } from '@/shared/types/dayEvent';
 import { DayEventType } from '@/shared/types/dayEventType';
+import type { AlterAssignmentItem, AlterVictimLockItem } from '@/shared/types/alteration';
 import type { BlockedVictimItem, StealerItem } from '@/shared/types/stealer';
 
 const TEST_ENV = {
@@ -26,6 +27,7 @@ describe('getEventType', () => {
   beforeEach(() => {
     vi.useFakeTimers();
     vi.setSystemTime(new Date('2026-06-07T15:00:00.000Z'));
+    vi.clearAllMocks();
   });
 
   afterEach(() => {
@@ -44,6 +46,7 @@ describe('getEventType', () => {
         { date: '2026-06-10', eventType: DayEventType.Jugadores },
         { date: '2026-06-12', eventType: DayEventType.Robo },
       ] satisfies DayEventItem[]);
+      vi.mocked(getItem).mockResolvedValue(null);
 
       const result = await getEventType('alejandro');
 
@@ -56,7 +59,10 @@ describe('getEventType', () => {
         },
       });
       expect(scanTable).toHaveBeenCalledWith('DayEvents');
-      expect(getItem).not.toHaveBeenCalled();
+      expect(getItem).toHaveBeenCalledWith('AlterAssignments', {
+        calendarDate: '2026-06-07',
+        username: 'alejandro',
+      });
       expect(scanTable).toHaveBeenCalledTimes(1);
     });
   });
@@ -81,10 +87,16 @@ describe('getEventType', () => {
           { username: 'another-blocked' },
         ] satisfies BlockedVictimItem[];
       });
-      vi.mocked(getItem).mockResolvedValue({
-        dayId: '2026-06-07',
-        stealerUsername: 'alejandro',
-      } satisfies StealerItem);
+      vi.mocked(getItem).mockImplementation(async (tableName) => {
+        if (tableName === 'Stealers') {
+          return {
+            dayId: '2026-06-07',
+            stealerUsername: 'alejandro',
+          } satisfies StealerItem;
+        }
+
+        return null;
+      });
 
       const result = await getEventType('alejandro');
 
@@ -103,6 +115,10 @@ describe('getEventType', () => {
       expect(getItem).toHaveBeenCalledWith('Stealers', {
         dayId: '2026-06-07',
         stealerUsername: 'alejandro',
+      });
+      expect(getItem).toHaveBeenCalledWith('AlterAssignments', {
+        calendarDate: '2026-06-07',
+        username: 'alejandro',
       });
       expect(scanTable).toHaveBeenCalledWith('BlockedVictims');
     });
@@ -135,6 +151,10 @@ describe('getEventType', () => {
         dayId: '2026-06-07',
         stealerUsername: 'alejandro',
       });
+      expect(getItem).toHaveBeenCalledWith('AlterAssignments', {
+        calendarDate: '2026-06-07',
+        username: 'alejandro',
+      });
     });
   });
 
@@ -151,11 +171,17 @@ describe('getEventType', () => {
         }
         return [] satisfies BlockedVictimItem[];
       });
-      vi.mocked(getItem).mockResolvedValue({
-        dayId: '2026-06-07',
-        stealerUsername: 'alejandro',
-        availableMatchSteals: ['wc26-m001', 'wc26-m003'],
-      } satisfies StealerItem);
+      vi.mocked(getItem).mockImplementation(async (tableName) => {
+        if (tableName === 'Stealers') {
+          return {
+            dayId: '2026-06-07',
+            stealerUsername: 'alejandro',
+            availableMatchSteals: ['wc26-m001', 'wc26-m003'],
+          } satisfies StealerItem;
+        }
+
+        return null;
+      });
 
       const result = await getEventType('alejandro');
 
@@ -176,10 +202,16 @@ describe('getEventType', () => {
         }
         return [] satisfies BlockedVictimItem[];
       });
-      vi.mocked(getItem).mockResolvedValue({
-        dayId: '2026-06-07',
-        stealerUsername: 'alejandro',
-      } satisfies StealerItem);
+      vi.mocked(getItem).mockImplementation(async (tableName) => {
+        if (tableName === 'Stealers') {
+          return {
+            dayId: '2026-06-07',
+            stealerUsername: 'alejandro',
+          } satisfies StealerItem;
+        }
+
+        return null;
+      });
 
       const result = await getEventType('alejandro');
 
@@ -190,10 +222,12 @@ describe('getEventType', () => {
   it('returns empty days when no day events exist', async () => {
     await withTestEnv(TEST_ENV, async () => {
       vi.resetModules();
+      const { getItem } = await import('@/shared/dynamo/getItem');
       const { scanTable } = await import('@/shared/dynamo/scanTable');
       const { getEventType } = await import('./getEventType');
 
       vi.mocked(scanTable).mockResolvedValue([] satisfies DayEventItem[]);
+      vi.mocked(getItem).mockResolvedValue(null);
 
       const result = await getEventType('alejandro');
 
@@ -201,6 +235,80 @@ describe('getEventType', () => {
         today: '2026-06-07',
         days: {},
       });
+    });
+  });
+
+  it('returns alter context only when the current user is assigned today', async () => {
+    await withTestEnv(TEST_ENV, async () => {
+      vi.resetModules();
+      const { getItem } = await import('@/shared/dynamo/getItem');
+      const { scanTable } = await import('@/shared/dynamo/scanTable');
+      const { getEventType } = await import('./getEventType');
+
+      vi.mocked(scanTable).mockImplementation(async (tableName: string) => {
+        if (tableName === 'DayEvents') {
+          return [{ date: '2026-06-07', eventType: DayEventType.Comun }] satisfies DayEventItem[];
+        }
+
+        return [
+          { victimUsername: 'blocked-victim' },
+          { victimUsername: 'another-victim' },
+        ] satisfies AlterVictimLockItem[];
+      });
+      vi.mocked(getItem).mockResolvedValue({
+        calendarDate: '2026-06-07',
+        username: 'alejandro',
+        createdAt: '2026-06-01T12:00:00.000Z',
+      } satisfies AlterAssignmentItem);
+
+      const result = await getEventType('alejandro');
+
+      expect(result).toEqual({
+        today: '2026-06-07',
+        days: {
+          '2026-06-07': { eventType: DayEventType.Comun },
+        },
+        alterContext: {
+          currentUserCanAlter: true,
+          blockedUsernames: ['blocked-victim', 'another-victim'],
+        },
+      });
+      expect(getItem).toHaveBeenCalledWith('AlterAssignments', {
+        calendarDate: '2026-06-07',
+        username: 'alejandro',
+      });
+      expect(scanTable).toHaveBeenCalledWith('AlterVictimLocks');
+    });
+  });
+
+  it('does not reveal alter context or future assignments when the user is not assigned today', async () => {
+    await withTestEnv(TEST_ENV, async () => {
+      vi.resetModules();
+      const { getItem } = await import('@/shared/dynamo/getItem');
+      const { scanTable } = await import('@/shared/dynamo/scanTable');
+      const { getEventType } = await import('./getEventType');
+
+      vi.mocked(scanTable).mockResolvedValue([
+        { date: '2026-06-07', eventType: DayEventType.Comun },
+        { date: '2026-06-10', eventType: DayEventType.Comun },
+      ] satisfies DayEventItem[]);
+      vi.mocked(getItem).mockResolvedValue(null);
+
+      const result = await getEventType('alejandro');
+
+      expect(result).toEqual({
+        today: '2026-06-07',
+        days: {
+          '2026-06-07': { eventType: DayEventType.Comun },
+          '2026-06-10': { eventType: DayEventType.Comun },
+        },
+      });
+      expect(getItem).toHaveBeenCalledTimes(1);
+      expect(getItem).toHaveBeenCalledWith('AlterAssignments', {
+        calendarDate: '2026-06-07',
+        username: 'alejandro',
+      });
+      expect(scanTable).not.toHaveBeenCalledWith('AlterVictimLocks');
     });
   });
 });

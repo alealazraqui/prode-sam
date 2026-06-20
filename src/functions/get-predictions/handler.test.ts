@@ -53,6 +53,8 @@ describe('get-predictions handler', () => {
         },
         allStealPicks: [],
         activeStealMatchIds: [],
+        myAlterPick: null,
+        allAlterPicks: [],
       });
 
       const { handler } = await import('./handler');
@@ -97,6 +99,8 @@ describe('get-predictions handler', () => {
         },
         allStealPicks: [],
         activeStealMatchIds: [],
+        myAlterPick: null,
+        allAlterPicks: [],
       });
       expect(getPredictions).toHaveBeenCalledWith('user1');
     });
