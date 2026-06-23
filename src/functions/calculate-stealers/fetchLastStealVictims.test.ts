@@ -28,7 +28,7 @@ describe('resolveLatestStealVictims', () => {
     expect(result).toEqual(['latest-victim-a', 'latest-victim-b']);
   });
 
-  it('excludes victims from the latest day when stolen points are zero', () => {
+  it('includes victims from the latest day even when stolen points are zero', () => {
     const result = resolveLatestStealVictims([
       stealPick('2026-06-04', 'old-blocked', 4),
       stealPick('2026-06-05', 'no-points-victim-a', 0),
@@ -36,7 +36,7 @@ describe('resolveLatestStealVictims', () => {
       stealPick('2026-06-05', 'robbed-victim', 2),
     ]);
 
-    expect(result).toEqual(['robbed-victim']);
+    expect(result).toEqual(['no-points-victim-a', 'no-points-victim-b', 'robbed-victim']);
   });
 
   it('returns an empty list when there are no steal picks', () => {

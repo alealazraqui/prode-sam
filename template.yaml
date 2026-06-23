@@ -401,6 +401,8 @@ Resources:
             TableName: !Ref StealPicksTable
         - DynamoDBReadPolicy:
             TableName: !Ref MatchesTable
+        - DynamoDBReadPolicy:
+            TableName: !Ref AlterPicksTable
       Events:
         GetPredictionsApi:
           Type: HttpApi
@@ -547,6 +549,8 @@ Resources:
             TableName: !Ref StealPicksTable
         - DynamoDBReadPolicy:
             TableName: !Ref LineupPicksTable
+        - DynamoDBReadPolicy:
+            TableName: !Ref AlterPicksTable
     Metadata:
       BuildMethod: esbuild
       BuildProperties:
@@ -595,6 +599,10 @@ Resources:
             TableName: !Ref BlockedVictimsTable
         - DynamoDBReadPolicy:
             TableName: !Ref DayEventsTable
+        - DynamoDBReadPolicy:
+            TableName: !Ref AlterAssignmentsTable
+        - DynamoDBReadPolicy:
+            TableName: !Ref AlterVictimLocksTable
       Events:
         GetEventTypeApi:
           Type: HttpApi
@@ -659,6 +667,10 @@ Resources:
             TableName: !Ref AlterAssignmentsTable
         - DynamoDBReadPolicy:
             TableName: !Ref MatchesTable
+        - DynamoDBWritePolicy:
+            TableName: !Ref AlterPicksTable
+        - DynamoDBWritePolicy:
+            TableName: !Ref AlterVictimLocksTable
         - Version: '2012-10-17'
           Statement:
             - Effect: Allow
